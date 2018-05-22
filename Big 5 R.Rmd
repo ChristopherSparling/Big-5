@@ -78,12 +78,15 @@ big5$y <- to_categorical(big5$sex, num_classes = 2) # Convert y to categorical
 # str(big5)
 ```
 
-```{r}
+```{r, message=FALSE, warning=FALSE, include=FALSE}
 epochs <- 15
-
+batch_size = 25
+output_units = 
+# Create training and testing sets
+  # No cross validation set in this deep-learning model, but could be implemented in the future
 train_indices <- 1:round(0.7*n)
-train_x <- big5$x[train_indices,]
-train_y <- big5$y[train_indices,]
+train_x <- data.matrix(big5$x[train_indices,])
+train_y <- data.matrix(big5$y[train_indices,])
 str(train_x)
 str(train_y)
 
@@ -94,8 +97,31 @@ str(test_x)
 str(test_y)
 
 # Model creation
+inputs <- layer_input(shape = c(5))
 model <- keras_model_sequential()
 
+model %>%
+  layer_dense(units = 7, input_shape = 5, name = "Input_Layer") %>%
+  layer_activation(activation = 'relu') %>%
+  layer_dense(units = 5, name = "Dense_2") %>%
+  layer_activation(activation = 'relu') %>%
+  layer_dense(units = 7, name = "Dense_3") %>%
+  layer_activation(activation = 'softmax')
+
+model %>% compile(
+  loss = loss_binary_crossentropy,
+  optimizer = rmsprop,
+  metrics = metric_binary_accuracy
+)
+
+model %>% fit(
+  x = train_x, y = train_y,
+  batch_size = batch_size,
+  epochs = epochs,
+  verbose = 2,
+  validation_split = 0.1
+)  
+  
 summary(model)
 ```
 
