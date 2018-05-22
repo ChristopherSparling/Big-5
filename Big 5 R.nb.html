@@ -175,151 +175,25 @@ $(document).ready(function () {
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShcInRpZHl2ZXJzZVwiKVxuZGF0YSA8LSByZWFkLmNzdihcIi4vQklHNS9kYXRhLmNzdlwiKSAlPiUgZmlsdGVyKGdlbmRlciAlaW4lIGMoMSwyKSlcbnN0cihkYXRhKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShcInRpZHl2ZXJzZVwiKVxubGlicmFyeShcImtlcmFzXCIpXG5kYXRhIDwtIHJlYWQuY3N2KFwiLi9CSUc1L2RhdGEuY3N2XCIpICU+JSBcbiAgZmlsdGVyKGdlbmRlciAlaW4lIGMoMSwyKSlcbmRhdGFfZ3UgPC0gcmVhZC5jc3YoXCIuL0JJRzUvZGF0YS5jc3ZcIikgJT4lIFxuICBmaWx0ZXIoZ2VuZGVyICVpbiUgYygzKSlcbiNzdHIoZGF0YSlcbiNzdW1tYXJ5KGRhdGEpXG5gYGAifQ== -->
 <pre class="r"><code>library(&quot;tidyverse&quot;)
-data &lt;- read.csv(&quot;./BIG5/data.csv&quot;) %&gt;% filter(gender %in% c(1,2))
-str(data)</code></pre>
+library(&quot;keras&quot;)
+data &lt;- read.csv(&quot;./BIG5/data.csv&quot;) %&gt;% 
+  filter(gender %in% c(1,2))
+data_gu &lt;- read.csv(&quot;./BIG5/data.csv&quot;) %&gt;% 
+  filter(gender %in% c(3))
+#str(data)
+#summary(data)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiJ2RhdGEuZnJhbWUnOlx0MTk1OTMgb2JzLiBvZiAgNTcgdmFyaWFibGVzOlxuICQgcmFjZSAgIDogaW50ICAzIDEzIDEgMyAxMSAxMyA1IDQgNSAzIC4uLlxuICQgYWdlICAgIDogaW50ICA1MyA0NiAxNCAxOSAyNSAzMSAyMCAyMyAzOSAxOCAuLi5cbiAkIGVuZ25hdCA6IGludCAgMSAxIDIgMiAyIDEgMSAyIDEgMSAuLi5cbiAkIGdlbmRlciA6IGludCAgMSAyIDIgMiAyIDIgMiAxIDIgMiAuLi5cbiAkIGhhbmQgICA6IGludCAgMSAxIDEgMSAxIDEgMSAxIDMgMSAuLi5cbiAkIHNvdXJjZSA6IGludCAgMSAxIDEgMSAyIDIgNSAyIDQgNSAuLi5cbiAkIGNvdW50cnk6IEZhY3RvciB3LyAxNTkgbGV2ZWxzIFwiXCIsXCIobnVcIixcIkExXCIsLi46IDE1MCAxNTAgMTIxIDEyOCAxNTAgMTUwIDE1MCA3MyAxNTAgMTUwIC4uLlxuICQgRTEgICAgIDogaW50ICA0IDIgNSAyIDMgMSA1IDQgMyAxIC4uLlxuICQgRTIgICAgIDogaW50ICAyIDIgMSA1IDEgNSAxIDMgMSA0IC4uLlxuICQgRTMgICAgIDogaW50ICA1IDMgMSAyIDMgMiA1IDUgNSAyIC4uLlxuICQgRTQgICAgIDogaW50ICAyIDMgNCA0IDMgNCAxIDMgMSA1IC4uLlxuICQgRTUgICAgIDogaW50ICA1IDMgNSAzIDMgMSA1IDUgNSAyIC4uLlxuICQgRTYgICAgIDogaW50ICAxIDMgMSA0IDEgMyAxIDEgMSA0IC4uLlxuICQgRTcgICAgIDogaW50ICA0IDEgMSAzIDMgMiA1IDQgNSAxIC4uLlxuICQgRTggICAgIDogaW50ICAzIDUgNSA0IDEgNCA0IDMgMiA0IC4uLlxuICQgRTkgICAgIDogaW50ICA1IDEgNSA0IDMgMSA0IDQgNSAxIC4uLlxuICQgRTEwICAgIDogaW50ICAxIDUgMSA1IDUgNSAxIDMgMyA1IC4uLlxuICQgTjEgICAgIDogaW50ICAxIDIgNSA1IDMgMSAyIDEgMiA1IC4uLlxuICQgTjIgICAgIDogaW50ICA1IDMgMSA0IDMgNSA0IDQgNCAyIC4uLlxuICQgTjMgICAgIDogaW50ICAyIDQgNSA0IDMgNCAyIDQgNSA1IC4uLlxuICQgTjQgICAgIDogaW50ICA1IDIgNSAyIDQgNSA0IDQgMyAyIC4uLlxuICQgTjUgICAgIDogaW50ICAxIDMgNSA0IDMgMSAyIDEgMyAzIC4uLlxuICQgTjYgICAgIDogaW50ICAxIDQgNSA1IDMgNCAyIDEgNSA0IC4uLlxuICQgTjcgICAgIDogaW50ICAxIDMgNSA1IDMgNCAzIDEgNSAzIC4uLlxuICQgTjggICAgIDogaW50ICAxIDIgNSA1IDMgMSAyIDEgNCAyIC4uLlxuICQgTjkgICAgIDogaW50ICAxIDIgNSA0IDMgNSAyIDEgMyAzIC4uLlxuICQgTjEwICAgIDogaW50ICAxIDQgNSA1IDQgMiAyIDEgMyA0IC4uLlxuICQgQTEgICAgIDogaW50ICAxIDEgNSAyIDUgMiA1IDIgMSAyIC4uLlxuICQgQTIgICAgIDogaW50ICA1IDMgMSA1IDUgMiA1IDUgNSAzIC4uLlxuICQgQTMgICAgIDogaW50ICAxIDMgNSA0IDMgMyAxIDEgMSAxIC4uLlxuICQgQTQgICAgIDogaW50ICA1IDQgNSA0IDUgNCA1IDQgNSA0IC4uLlxuICQgQTUgICAgIDogaW50ICAyIDQgMSAzIDEgMyAxIDMgMSAyIC4uLlxuICQgQTYgICAgIDogaW50ICAzIDQgNSA1IDUgNCA1IDMgNSA0IC4uLlxuICQgQTcgICAgIDogaW50ICAxIDIgMSAzIDEgMyAxIDEgMSAzIC4uLlxuICQgQTggICAgIDogaW50ICA1IDMgNSA0IDUgNSA1IDMgNSAzIC4uLlxuICQgQTkgICAgIDogaW50ICA0IDQgNSA0IDUgNSA0IDQgNSAzIC4uLlxuICQgQTEwICAgIDogaW50ICA1IDMgNSAzIDUgMyA1IDUgNCAyIC4uLlxuICQgQzEgICAgIDogaW50ICA0IDQgNCAzIDMgMiAyIDQgNCA1IC4uLlxuICQgQzIgICAgIDogaW50ICAxIDEgMSAzIDEgNSA0IDIgMyAyIC4uLlxuICQgQzMgICAgIDogaW50ICA1IDMgNSA0IDUgNCAzIDUgNSA0IC4uLlxuICQgQzQgICAgIDogaW50ICAxIDIgMSA1IDMgMyAzIDEgMiAyIC4uLlxuICQgQzUgICAgIDogaW50ICA1IDMgNSAxIDMgMyAzIDQgNSAzIC4uLlxuICQgQzYgICAgIDogaW50ICAxIDEgMSA0IDEgNCAzIDEgMiAyIC4uLlxuICQgQzcgICAgIDogaW50ICA0IDUgNSA1IDEgNSAzIDQgNSA0IC4uLlxuICQgQzggICAgIDogaW50ICAxIDEgMSA0IDMgMyAzIDEgMiAyIC4uLlxuICQgQzkgICAgIDogaW50ICA0IDQgNSAyIDMgNSAzIDMgNCA0IC4uLlxuICQgQzEwICAgIDogaW50ICA1IDQgNSAzIDMgMyAzIDUgMyA0IC4uLlxuICQgTzEgICAgIDogaW50ICA0IDMgNCA0IDMgNCAzIDMgMyA0IC4uLlxuICQgTzIgICAgIDogaW50ICAxIDMgNSAzIDEgMiAxIDEgMyAyIC4uLlxuICQgTzMgICAgIDogaW50ICAzIDMgNSA1IDEgMSA1IDUgNSA1IC4uLlxuICQgTzQgICAgIDogaW50ICAxIDMgMSAyIDEgMyAxIDEgMyAyIC4uLlxuICQgTzUgICAgIDogaW50ICA1IDIgNSA0IDMgMyA0IDQgNSA0IC4uLlxuICQgTzYgICAgIDogaW50ICAxIDMgMSAyIDEgNSAxIDEgMSAxIC4uLlxuICQgTzcgICAgIDogaW50ICA0IDMgNSA1IDMgNSA0IDUgNSA0IC4uLlxuICQgTzggICAgIDogaW50ICAyIDEgNSAyIDEgNCAzIDMgMyAzIC4uLlxuICQgTzkgICAgIDogaW50ICA1IDMgNSA1IDUgNSAzIDIgNCA0IC4uLlxuICQgTzEwICAgIDogaW50ICA1IDIgNSA1IDMgMyA0IDUgNSA0IC4uLlxuIn0= -->
-<pre><code>'data.frame':   19593 obs. of  57 variables:
- $ race   : int  3 13 1 3 11 13 5 4 5 3 ...
- $ age    : int  53 46 14 19 25 31 20 23 39 18 ...
- $ engnat : int  1 1 2 2 2 1 1 2 1 1 ...
- $ gender : int  1 2 2 2 2 2 2 1 2 2 ...
- $ hand   : int  1 1 1 1 1 1 1 1 3 1 ...
- $ source : int  1 1 1 1 2 2 5 2 4 5 ...
- $ country: Factor w/ 159 levels &quot;&quot;,&quot;(nu&quot;,&quot;A1&quot;,..: 150 150 121 128 150 150 150 73 150 150 ...
- $ E1     : int  4 2 5 2 3 1 5 4 3 1 ...
- $ E2     : int  2 2 1 5 1 5 1 3 1 4 ...
- $ E3     : int  5 3 1 2 3 2 5 5 5 2 ...
- $ E4     : int  2 3 4 4 3 4 1 3 1 5 ...
- $ E5     : int  5 3 5 3 3 1 5 5 5 2 ...
- $ E6     : int  1 3 1 4 1 3 1 1 1 4 ...
- $ E7     : int  4 1 1 3 3 2 5 4 5 1 ...
- $ E8     : int  3 5 5 4 1 4 4 3 2 4 ...
- $ E9     : int  5 1 5 4 3 1 4 4 5 1 ...
- $ E10    : int  1 5 1 5 5 5 1 3 3 5 ...
- $ N1     : int  1 2 5 5 3 1 2 1 2 5 ...
- $ N2     : int  5 3 1 4 3 5 4 4 4 2 ...
- $ N3     : int  2 4 5 4 3 4 2 4 5 5 ...
- $ N4     : int  5 2 5 2 4 5 4 4 3 2 ...
- $ N5     : int  1 3 5 4 3 1 2 1 3 3 ...
- $ N6     : int  1 4 5 5 3 4 2 1 5 4 ...
- $ N7     : int  1 3 5 5 3 4 3 1 5 3 ...
- $ N8     : int  1 2 5 5 3 1 2 1 4 2 ...
- $ N9     : int  1 2 5 4 3 5 2 1 3 3 ...
- $ N10    : int  1 4 5 5 4 2 2 1 3 4 ...
- $ A1     : int  1 1 5 2 5 2 5 2 1 2 ...
- $ A2     : int  5 3 1 5 5 2 5 5 5 3 ...
- $ A3     : int  1 3 5 4 3 3 1 1 1 1 ...
- $ A4     : int  5 4 5 4 5 4 5 4 5 4 ...
- $ A5     : int  2 4 1 3 1 3 1 3 1 2 ...
- $ A6     : int  3 4 5 5 5 4 5 3 5 4 ...
- $ A7     : int  1 2 1 3 1 3 1 1 1 3 ...
- $ A8     : int  5 3 5 4 5 5 5 3 5 3 ...
- $ A9     : int  4 4 5 4 5 5 4 4 5 3 ...
- $ A10    : int  5 3 5 3 5 3 5 5 4 2 ...
- $ C1     : int  4 4 4 3 3 2 2 4 4 5 ...
- $ C2     : int  1 1 1 3 1 5 4 2 3 2 ...
- $ C3     : int  5 3 5 4 5 4 3 5 5 4 ...
- $ C4     : int  1 2 1 5 3 3 3 1 2 2 ...
- $ C5     : int  5 3 5 1 3 3 3 4 5 3 ...
- $ C6     : int  1 1 1 4 1 4 3 1 2 2 ...
- $ C7     : int  4 5 5 5 1 5 3 4 5 4 ...
- $ C8     : int  1 1 1 4 3 3 3 1 2 2 ...
- $ C9     : int  4 4 5 2 3 5 3 3 4 4 ...
- $ C10    : int  5 4 5 3 3 3 3 5 3 4 ...
- $ O1     : int  4 3 4 4 3 4 3 3 3 4 ...
- $ O2     : int  1 3 5 3 1 2 1 1 3 2 ...
- $ O3     : int  3 3 5 5 1 1 5 5 5 5 ...
- $ O4     : int  1 3 1 2 1 3 1 1 3 2 ...
- $ O5     : int  5 2 5 4 3 3 4 4 5 4 ...
- $ O6     : int  1 3 1 2 1 5 1 1 1 1 ...
- $ O7     : int  4 3 5 5 3 5 4 5 5 4 ...
- $ O8     : int  2 1 5 2 1 4 3 3 3 3 ...
- $ O9     : int  5 3 5 5 5 5 3 2 4 4 ...
- $ O10    : int  5 2 5 5 3 3 4 5 5 4 ...</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtbWFyeShkYXRhKVxuYGBgIn0= -->
-<pre class="r"><code>summary(data)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgcmFjZSAgICAgICAgICAgICBhZ2UgICAgICAgICAgICAgIGVuZ25hdCAgICAgICAgICBnZW5kZXIgICAgICAgICAgIGhhbmQgICAgICAgICAgIHNvdXJjZSAgICAgICAgIGNvdW50cnkgICAgXG4gTWluLiAgIDogMC4wMDAgICBNaW4uICAgOiAgMTMuMDAgICBNaW4uICAgOjAuMDAwICAgTWluLiAgIDoxLjAwMCAgIE1pbi4gICA6MC4wMDAgICBNaW4uICAgOjEuMDAwICAgVVMgICAgIDo4Njg0ICBcbiAxc3QgUXUuOiAzLjAwMCAgIDFzdCBRdS46ICAxOC4wMCAgIDFzdCBRdS46MS4wMDAgICAxc3QgUXUuOjEuMDAwICAgMXN0IFF1LjoxLjAwMCAgIDFzdCBRdS46MS4wMDAgICBHQiAgICAgOjE1MjAgIFxuIE1lZGlhbiA6IDMuMDAwICAgTWVkaWFuIDogIDIyLjAwICAgTWVkaWFuIDoxLjAwMCAgIE1lZGlhbiA6Mi4wMDAgICBNZWRpYW4gOjEuMDAwICAgTWVkaWFuIDoxLjAwMCAgIElOICAgICA6MTQ2MiAgXG4gTWVhbiAgIDogNS4zMjcgICBNZWFuICAgOiAgMzMuNDcgICBNZWFuICAgOjEuMzY1ICAgTWVhbiAgIDoxLjYxMiAgIE1lYW4gICA6MS4xMjkgICBNZWFuICAgOjEuOTU0ICAgQVUgICAgIDogOTcxICBcbiAzcmQgUXUuOiA4LjAwMCAgIDNyZCBRdS46ICAzMS4wMCAgIDNyZCBRdS46Mi4wMDAgICAzcmQgUXUuOjIuMDAwICAgM3JkIFF1LjoxLjAwMCAgIDNyZCBRdS46Mi4wMDAgICBDQSAgICAgOiA5MTUgIFxuIE1heC4gICA6MTMuMDAwICAgTWF4LiAgIDoyMDAwLjAwICAgTWF4LiAgIDoyLjAwMCAgIE1heC4gICA6Mi4wMDAgICBNYXguICAgOjMuMDAwICAgTWF4LiAgIDo1LjAwMCAgIChPdGhlcik6NjAzMyAgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgTkEncyAgIDogICA4ICBcbiAgICAgICBFMSAgICAgICAgICAgICAgRTIgICAgICAgICAgICAgIEUzICAgICAgICAgICAgICBFNCAgICAgICAgICAgICBFNSAgICAgICAgICAgICAgRTYgICAgICAgICAgICAgIEU3ICAgICAgIFxuIE1pbi4gICA6MC4wMDAgICBNaW4uICAgOjAuMDAwICAgTWluLiAgIDowLjAwMCAgIE1pbi4gICA6MC4wMCAgIE1pbi4gICA6MC4wMDAgICBNaW4uICAgOjAuMDAwICAgTWluLiAgIDowLjAwMCAgXG4gMXN0IFF1LjoyLjAwMCAgIDFzdCBRdS46Mi4wMDAgICAxc3QgUXUuOjMuMDAwICAgMXN0IFF1LjoyLjAwICAgMXN0IFF1LjoyLjAwMCAgIDFzdCBRdS46MS4wMDAgICAxc3QgUXUuOjIuMDAwICBcbiBNZWRpYW4gOjMuMDAwICAgTWVkaWFuIDozLjAwMCAgIE1lZGlhbiA6NC4wMDAgICBNZWRpYW4gOjMuMDAgICBNZWRpYW4gOjQuMDAwICAgTWVkaWFuIDoyLjAwMCAgIE1lZGlhbiA6My4wMDAgIFxuIE1lYW4gICA6Mi42MzIgICBNZWFuICAgOjIuNzU2ICAgTWVhbiAgIDozLjQyMSAgIE1lYW4gICA6My4xNSAgIE1lYW4gICA6My40MzYgICBNZWFuICAgOjIuNDUyICAgTWVhbiAgIDoyLjg3MiAgXG4gM3JkIFF1Ljo0LjAwMCAgIDNyZCBRdS46NC4wMDAgICAzcmQgUXUuOjQuMDAwICAgM3JkIFF1Ljo0LjAwICAgM3JkIFF1Ljo1LjAwMCAgIDNyZCBRdS46My4wMDAgICAzcmQgUXUuOjQuMDAwICBcbiBNYXguICAgOjUuMDAwICAgTWF4LiAgIDo1LjAwMCAgIE1heC4gICA6NS4wMDAgICBNYXguICAgOjUuMDAgICBNYXguICAgOjUuMDAwICAgTWF4LiAgIDo1LjAwMCAgIE1heC4gICA6NS4wMDAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgRTggICAgICAgICAgICAgIEU5ICAgICAgICAgICAgIEUxMCAgICAgICAgICAgICAgTjEgICAgICAgICAgICAgIE4yICAgICAgICAgICAgICBOMyAgICAgICAgICAgICAgTjQgICAgICAgXG4gTWluLiAgIDowLjAwMCAgIE1pbi4gICA6MC4wMDAgICBNaW4uICAgOjAuMDAwICAgTWluLiAgIDowLjAwMCAgIE1pbi4gICA6MC4wMDAgICBNaW4uICAgOjAuMDAwICAgTWluLiAgIDowLjAwMCAgXG4gMXN0IFF1LjoyLjAwMCAgIDFzdCBRdS46Mi4wMDAgICAxc3QgUXUuOjMuMDAwICAgMXN0IFF1LjoyLjAwMCAgIDFzdCBRdS46Mi4wMDAgICAxc3QgUXUuOjMuMDAwICAgMXN0IFF1LjoyLjAwMCAgXG4gTWVkaWFuIDozLjAwMCAgIE1lZGlhbiA6My4wMDAgICBNZWRpYW4gOjQuMDAwICAgTWVkaWFuIDozLjAwMCAgIE1lZGlhbiA6My4wMDAgICBNZWRpYW4gOjQuMDAwICAgTWVkaWFuIDozLjAwMCAgXG4gTWVhbiAgIDozLjM3NCAgIE1lYW4gICA6My4wOTcgICBNZWFuICAgOjMuNTgyICAgTWVhbiAgIDozLjI2MSAgIE1lYW4gICA6My4yMzUgICBNZWFuICAgOjMuODQyICAgTWVhbiAgIDoyLjc1OSAgXG4gM3JkIFF1Ljo0LjAwMCAgIDNyZCBRdS46NC4wMDAgICAzcmQgUXUuOjUuMDAwICAgM3JkIFF1Ljo0LjAwMCAgIDNyZCBRdS46NC4wMDAgICAzcmQgUXUuOjUuMDAwICAgM3JkIFF1Ljo0LjAwMCAgXG4gTWF4LiAgIDo1LjAwMCAgIE1heC4gICA6NS4wMDAgICBNYXguICAgOjUuMDAwICAgTWF4LiAgIDo1LjAwMCAgIE1heC4gICA6NS4wMDAgICBNYXguICAgOjUuMDAwICAgTWF4LiAgIDo1LjAwMCAgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgTjUgICAgICAgICAgICAgIE42ICAgICAgICAgICAgIE43ICAgICAgICAgICAgICBOOCAgICAgICAgICAgICAgTjkgICAgICAgICAgICAgTjEwICAgICAgICAgICAgIEExICAgICAgIFxuIE1pbi4gICA6MC4wMDAgICBNaW4uICAgOjAuMDAgICBNaW4uICAgOjAuMDAwICAgTWluLiAgIDowLjAwMCAgIE1pbi4gICA6MC4wMDAgICBNaW4uICAgOjAuMDAgICBNaW4uICAgOjAuMDAwICBcbiAxc3QgUXUuOjIuMDAwICAgMXN0IFF1LjoyLjAwICAgMXN0IFF1LjoyLjAwMCAgIDFzdCBRdS46Mi4wMDAgICAxc3QgUXUuOjIuMDAwICAgMXN0IFF1LjoyLjAwICAgMXN0IFF1LjoxLjAwMCAgXG4gTWVkaWFuIDozLjAwMCAgIE1lZGlhbiA6My4wMCAgIE1lZGlhbiA6My4wMDAgICBNZWRpYW4gOjMuMDAwICAgTWVkaWFuIDozLjAwMCAgIE1lZGlhbiA6My4wMCAgIE1lZGlhbiA6Mi4wMDAgIFxuIE1lYW4gICA6Mi45NTIgICBNZWFuICAgOjIuOTggICBNZWFuICAgOjMuMTUxICAgTWVhbiAgIDoyLjgwMiAgIE1lYW4gICA6My4xMzQgICBNZWFuICAgOjIuODMgICBNZWFuICAgOjIuMzExICBcbiAzcmQgUXUuOjQuMDAwICAgM3JkIFF1Ljo0LjAwICAgM3JkIFF1Ljo0LjAwMCAgIDNyZCBRdS46NC4wMDAgICAzcmQgUXUuOjQuMDAwICAgM3JkIFF1Ljo0LjAwICAgM3JkIFF1LjozLjAwMCAgXG4gTWF4LiAgIDo1LjAwMCAgIE1heC4gICA6NS4wMCAgIE1heC4gICA6NS4wMDAgICBNYXguICAgOjUuMDAwICAgTWF4LiAgIDo1LjAwMCAgIE1heC4gICA6NS4wMCAgIE1heC4gICA6NS4wMDAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICBBMiAgICAgICAgICAgICAgQTMgICAgICAgICAgICAgIEE0ICAgICAgICAgICAgICBBNSAgICAgICAgICAgICAgQTYgICAgICAgICAgICAgIEE3ICAgICAgICAgICAgICBBOCAgICAgICBcbiBNaW4uICAgOjAuMDAwICAgTWluLiAgIDowLjAwMCAgIE1pbi4gICA6MC4wMDAgICBNaW4uICAgOjAuMDAwICAgTWluLiAgIDowLjAwMCAgIE1pbi4gICA6MC4wMDAgICBNaW4uICAgOjAuMDAwICBcbiAxc3QgUXUuOjMuMDAwICAgMXN0IFF1LjoxLjAwMCAgIDFzdCBRdS46NC4wMDAgICAxc3QgUXUuOjEuMDAwICAgMXN0IFF1LjozLjAwMCAgIDFzdCBRdS46MS4wMDAgICAxc3QgUXUuOjMuMDAwICBcbiBNZWRpYW4gOjQuMDAwICAgTWVkaWFuIDoyLjAwMCAgIE1lZGlhbiA6NC4wMDAgICBNZWRpYW4gOjIuMDAwICAgTWVkaWFuIDo0LjAwMCAgIE1lZGlhbiA6Mi4wMDAgICBNZWRpYW4gOjQuMDAwICBcbiBNZWFuICAgOjMuOTI4ICAgTWVhbiAgIDoyLjE2MSAgIE1lYW4gICA6NC4wMzIgICBNZWFuICAgOjIuMTY0ICAgTWVhbiAgIDozLjg5OCAgIE1lYW4gICA6Mi4xNTkgICBNZWFuICAgOjMuNzY4ICBcbiAzcmQgUXUuOjUuMDAwICAgM3JkIFF1LjozLjAwMCAgIDNyZCBRdS46NS4wMDAgICAzcmQgUXUuOjMuMDAwICAgM3JkIFF1Ljo1LjAwMCAgIDNyZCBRdS46My4wMDAgICAzcmQgUXUuOjUuMDAwICBcbiBNYXguICAgOjUuMDAwICAgTWF4LiAgIDo1LjAwMCAgIE1heC4gICA6NS4wMDAgICBNYXguICAgOjUuMDAwICAgTWF4LiAgIDo1LjAwMCAgIE1heC4gICA6NS4wMDAgICBNYXguICAgOjUuMDAwICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICBBOSAgICAgICAgICAgICBBMTAgICAgICAgICAgICAgIEMxICAgICAgICAgICAgIEMyICAgICAgICAgICAgICBDMyAgICAgICAgICAgICAgQzQgICAgICAgICAgICAgIEM1ICAgICAgIFxuIE1pbi4gICA6MC4wMDAgICBNaW4uICAgOjAuMDAwICAgTWluLiAgIDowLjAwICAgTWluLiAgIDowLjAwMCAgIE1pbi4gICA6MC4wMDAgICBNaW4uICAgOjAuMDAwICAgTWluLiAgIDowLjAwMCAgXG4gMXN0IFF1LjozLjAwMCAgIDFzdCBRdS46My4wMDAgICAxc3QgUXUuOjMuMDAgICAxc3QgUXUuOjIuMDAwICAgMXN0IFF1LjozLjAwMCAgIDFzdCBRdS46Mi4wMDAgICAxc3QgUXUuOjIuMDAwICBcbiBNZWRpYW4gOjQuMDAwICAgTWVkaWFuIDo0LjAwMCAgIE1lZGlhbiA6My4wMCAgIE1lZGlhbiA6My4wMDAgICBNZWRpYW4gOjQuMDAwICAgTWVkaWFuIDozLjAwMCAgIE1lZGlhbiA6My4wMDAgIFxuIE1lYW4gICA6My45NDcgICBNZWFuICAgOjMuNjg1ICAgTWVhbiAgIDozLjMyICAgTWVhbiAgIDoyLjk3OCAgIE1lYW4gICA6My45ODIgICBNZWFuICAgOjIuNjUyICAgTWVhbiAgIDoyLjcwMiAgXG4gM3JkIFF1Ljo1LjAwMCAgIDNyZCBRdS46NS4wMDAgICAzcmQgUXUuOjQuMDAgICAzcmQgUXUuOjQuMDAwICAgM3JkIFF1Ljo1LjAwMCAgIDNyZCBRdS46NC4wMDAgICAzcmQgUXUuOjQuMDAwICBcbiBNYXguICAgOjUuMDAwICAgTWF4LiAgIDo1LjAwMCAgIE1heC4gICA6NS4wMCAgIE1heC4gICA6NS4wMDAgICBNYXguICAgOjUuMDAwICAgTWF4LiAgIDo1LjAwMCAgIE1heC4gICA6NS4wMDAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgQzYgICAgICAgICAgICAgIEM3ICAgICAgICAgICAgICBDOCAgICAgICAgICAgICAgQzkgICAgICAgICAgICAgQzEwICAgICAgICAgICAgICBPMSAgICAgICAgICAgICBPMiAgICAgICBcbiBNaW4uICAgOjAuMDAwICAgTWluLiAgIDowLjAwMCAgIE1pbi4gICA6MC4wMDAgICBNaW4uICAgOjAuMDAwICAgTWluLiAgIDowLjAwMCAgIE1pbi4gICA6MC4wMCAgIE1pbi4gICA6MC4wMDAgIFxuIDFzdCBRdS46Mi4wMDAgICAxc3QgUXUuOjMuMDAwICAgMXN0IFF1LjoyLjAwMCAgIDFzdCBRdS46Mi4wMDAgICAxc3QgUXUuOjMuMDAwICAgMXN0IFF1LjozLjAwICAgMXN0IFF1LjoxLjAwMCAgXG4gTWVkaWFuIDozLjAwMCAgIE1lZGlhbiA6NC4wMDAgICBNZWRpYW4gOjIuMDAwICAgTWVkaWFuIDozLjAwMCAgIE1lZGlhbiA6NC4wMDAgICBNZWRpYW4gOjQuMDAgICBNZWRpYW4gOjIuMDAwICBcbiBNZWFuICAgOjIuOTIxICAgTWVhbiAgIDozLjY0NyAgIE1lYW4gICA6Mi40NzkgICBNZWFuICAgOjMuMjI1ICAgTWVhbiAgIDozLjYzOCAgIE1lYW4gICA6My42OSAgIE1lYW4gICA6Mi4xNTEgIFxuIDNyZCBRdS46NC4wMDAgICAzcmQgUXUuOjUuMDAwICAgM3JkIFF1LjozLjAwMCAgIDNyZCBRdS46NC4wMDAgICAzcmQgUXUuOjQuMDAwICAgM3JkIFF1Ljo1LjAwICAgM3JkIFF1LjozLjAwMCAgXG4gTWF4LiAgIDo1LjAwMCAgIE1heC4gICA6NS4wMDAgICBNYXguICAgOjUuMDAwICAgTWF4LiAgIDo1LjAwMCAgIE1heC4gICA6NS4wMDAgICBNYXguICAgOjUuMDAgICBNYXguICAgOjUuMDAwICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuICAgICAgIE8zICAgICAgICAgICAgICBPNCAgICAgICAgICAgICAgTzUgICAgICAgICAgICAgIE82ICAgICAgICAgICAgICBPNyAgICAgICAgICAgICAgTzggICAgICAgICAgICAgIE85ICAgICAgIFxuIE1pbi4gICA6MC4wMDAgICBNaW4uICAgOjAuMDAwICAgTWluLiAgIDowLjAwMCAgIE1pbi4gICA6MC4wMDAgICBNaW4uICAgOjAuMDAwICAgTWluLiAgIDowLjAwMCAgIE1pbi4gICA6MC4wMDAgIFxuIDFzdCBRdS46NC4wMDAgICAxc3QgUXUuOjEuMDAwICAgMXN0IFF1LjozLjAwMCAgIDFzdCBRdS46MS4wMDAgICAxc3QgUXUuOjQuMDAwICAgMXN0IFF1LjoyLjAwMCAgIDFzdCBRdS46NC4wMDAgIFxuIE1lZGlhbiA6NC4wMDAgICBNZWRpYW4gOjIuMDAwICAgTWVkaWFuIDo0LjAwMCAgIE1lZGlhbiA6MS4wMDAgICBNZWRpYW4gOjQuMDAwICAgTWVkaWFuIDozLjAwMCAgIE1lZGlhbiA6NC4wMDAgIFxuIE1lYW4gICA6NC4xMjMgICBNZWFuICAgOjIuMDgxICAgTWVhbiAgIDozLjg3MyAgIE1lYW4gICA6MS43OTYgICBNZWFuICAgOjQuMDcyICAgTWVhbiAgIDozLjIwNSAgIE1lYW4gICA6NC4xMzMgIFxuIDNyZCBRdS46NS4wMDAgICAzcmQgUXUuOjMuMDAwICAgM3JkIFF1Ljo1LjAwMCAgIDNyZCBRdS46Mi4wMDAgICAzcmQgUXUuOjUuMDAwICAgM3JkIFF1Ljo0LjAwMCAgIDNyZCBRdS46NS4wMDAgIFxuIE1heC4gICA6NS4wMDAgICBNYXguICAgOjUuMDAwICAgTWF4LiAgIDo1LjAwMCAgIE1heC4gICA6NS4wMDAgICBNYXguICAgOjUuMDAwICAgTWF4LiAgIDo1LjAwMCAgIE1heC4gICA6NS4wMDAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuICAgICAgTzEwICAgICAgIFxuIE1pbi4gICA6MC4wMDAgIFxuIDFzdCBRdS46My4wMDAgIFxuIE1lZGlhbiA6NC4wMDAgIFxuIE1lYW4gICA6NC4wMDMgIFxuIDNyZCBRdS46NS4wMDAgIFxuIE1heC4gICA6NS4wMDAgIFxuICAgICAgICAgICAgICAgIFxuIn0= -->
-<pre><code>      race             age              engnat          gender           hand           source         country    
- Min.   : 0.000   Min.   :  13.00   Min.   :0.000   Min.   :1.000   Min.   :0.000   Min.   :1.000   US     :8684  
- 1st Qu.: 3.000   1st Qu.:  18.00   1st Qu.:1.000   1st Qu.:1.000   1st Qu.:1.000   1st Qu.:1.000   GB     :1520  
- Median : 3.000   Median :  22.00   Median :1.000   Median :2.000   Median :1.000   Median :1.000   IN     :1462  
- Mean   : 5.327   Mean   :  33.47   Mean   :1.365   Mean   :1.612   Mean   :1.129   Mean   :1.954   AU     : 971  
- 3rd Qu.: 8.000   3rd Qu.:  31.00   3rd Qu.:2.000   3rd Qu.:2.000   3rd Qu.:1.000   3rd Qu.:2.000   CA     : 915  
- Max.   :13.000   Max.   :2000.00   Max.   :2.000   Max.   :2.000   Max.   :3.000   Max.   :5.000   (Other):6033  
-                                                                                                    NA's   :   8  
-       E1              E2              E3              E4             E5              E6              E7       
- Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.00   Min.   :0.000   Min.   :0.000   Min.   :0.000  
- 1st Qu.:2.000   1st Qu.:2.000   1st Qu.:3.000   1st Qu.:2.00   1st Qu.:2.000   1st Qu.:1.000   1st Qu.:2.000  
- Median :3.000   Median :3.000   Median :4.000   Median :3.00   Median :4.000   Median :2.000   Median :3.000  
- Mean   :2.632   Mean   :2.756   Mean   :3.421   Mean   :3.15   Mean   :3.436   Mean   :2.452   Mean   :2.872  
- 3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:4.00   3rd Qu.:5.000   3rd Qu.:3.000   3rd Qu.:4.000  
- Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.00   Max.   :5.000   Max.   :5.000   Max.   :5.000  
-                                                                                                               
-       E8              E9             E10              N1              N2              N3              N4       
- Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000  
- 1st Qu.:2.000   1st Qu.:2.000   1st Qu.:3.000   1st Qu.:2.000   1st Qu.:2.000   1st Qu.:3.000   1st Qu.:2.000  
- Median :3.000   Median :3.000   Median :4.000   Median :3.000   Median :3.000   Median :4.000   Median :3.000  
- Mean   :3.374   Mean   :3.097   Mean   :3.582   Mean   :3.261   Mean   :3.235   Mean   :3.842   Mean   :2.759  
- 3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:5.000   3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:5.000   3rd Qu.:4.000  
- Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000  
-                                                                                                                
-       N5              N6             N7              N8              N9             N10             A1       
- Min.   :0.000   Min.   :0.00   Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.00   Min.   :0.000  
- 1st Qu.:2.000   1st Qu.:2.00   1st Qu.:2.000   1st Qu.:2.000   1st Qu.:2.000   1st Qu.:2.00   1st Qu.:1.000  
- Median :3.000   Median :3.00   Median :3.000   Median :3.000   Median :3.000   Median :3.00   Median :2.000  
- Mean   :2.952   Mean   :2.98   Mean   :3.151   Mean   :2.802   Mean   :3.134   Mean   :2.83   Mean   :2.311  
- 3rd Qu.:4.000   3rd Qu.:4.00   3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:4.00   3rd Qu.:3.000  
- Max.   :5.000   Max.   :5.00   Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.00   Max.   :5.000  
-                                                                                                              
-       A2              A3              A4              A5              A6              A7              A8       
- Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000  
- 1st Qu.:3.000   1st Qu.:1.000   1st Qu.:4.000   1st Qu.:1.000   1st Qu.:3.000   1st Qu.:1.000   1st Qu.:3.000  
- Median :4.000   Median :2.000   Median :4.000   Median :2.000   Median :4.000   Median :2.000   Median :4.000  
- Mean   :3.928   Mean   :2.161   Mean   :4.032   Mean   :2.164   Mean   :3.898   Mean   :2.159   Mean   :3.768  
- 3rd Qu.:5.000   3rd Qu.:3.000   3rd Qu.:5.000   3rd Qu.:3.000   3rd Qu.:5.000   3rd Qu.:3.000   3rd Qu.:5.000  
- Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000  
-                                                                                                                
-       A9             A10              C1             C2              C3              C4              C5       
- Min.   :0.000   Min.   :0.000   Min.   :0.00   Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000  
- 1st Qu.:3.000   1st Qu.:3.000   1st Qu.:3.00   1st Qu.:2.000   1st Qu.:3.000   1st Qu.:2.000   1st Qu.:2.000  
- Median :4.000   Median :4.000   Median :3.00   Median :3.000   Median :4.000   Median :3.000   Median :3.000  
- Mean   :3.947   Mean   :3.685   Mean   :3.32   Mean   :2.978   Mean   :3.982   Mean   :2.652   Mean   :2.702  
- 3rd Qu.:5.000   3rd Qu.:5.000   3rd Qu.:4.00   3rd Qu.:4.000   3rd Qu.:5.000   3rd Qu.:4.000   3rd Qu.:4.000  
- Max.   :5.000   Max.   :5.000   Max.   :5.00   Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000  
-                                                                                                               
-       C6              C7              C8              C9             C10              O1             O2       
- Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.00   Min.   :0.000  
- 1st Qu.:2.000   1st Qu.:3.000   1st Qu.:2.000   1st Qu.:2.000   1st Qu.:3.000   1st Qu.:3.00   1st Qu.:1.000  
- Median :3.000   Median :4.000   Median :2.000   Median :3.000   Median :4.000   Median :4.00   Median :2.000  
- Mean   :2.921   Mean   :3.647   Mean   :2.479   Mean   :3.225   Mean   :3.638   Mean   :3.69   Mean   :2.151  
- 3rd Qu.:4.000   3rd Qu.:5.000   3rd Qu.:3.000   3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:5.00   3rd Qu.:3.000  
- Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.00   Max.   :5.000  
-                                                                                                               
-       O3              O4              O5              O6              O7              O8              O9       
- Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000  
- 1st Qu.:4.000   1st Qu.:1.000   1st Qu.:3.000   1st Qu.:1.000   1st Qu.:4.000   1st Qu.:2.000   1st Qu.:4.000  
- Median :4.000   Median :2.000   Median :4.000   Median :1.000   Median :4.000   Median :3.000   Median :4.000  
- Mean   :4.123   Mean   :2.081   Mean   :3.873   Mean   :1.796   Mean   :4.072   Mean   :3.205   Mean   :4.133  
- 3rd Qu.:5.000   3rd Qu.:3.000   3rd Qu.:5.000   3rd Qu.:2.000   3rd Qu.:5.000   3rd Qu.:4.000   3rd Qu.:5.000  
- Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000  
-                                                                                                                
-      O10       
- Min.   :0.000  
- 1st Qu.:3.000  
- Median :4.000  
- Mean   :4.003  
- 3rd Qu.:5.000  
- Max.   :5.000  
-                </code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Trait Definitions: O: Low Openness -&gt; High Openness C: Low Conscientiousness -&gt; High Conscientiousness E: Intraversion -&gt; Extraversion A: Disagreeableness -&gt; Agreeableness N: Low Neuroticism -&gt; High Neuroticism</p>
+<p>Only select rows with predictable genders. Non-specified could also be considered if there were more samples, but at the time of writing this only <strong>102</strong> observations are present in the data set.</p>
+<p>Trait Definitions:<br />
+O: Low Openness -&gt; High Openness<br />
+C: Low Conscientiousness -&gt; High Conscientiousness<br />
+E: Intraversion -&gt; Extraversion<br />
+A: Disagreeableness -&gt; Agreeableness<br />
+N: Low Neuroticism -&gt; High Neuroticism</p>
 <p>Define R function to correct for question</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
@@ -335,8 +209,6 @@ str(data)</code></pre>
 qCorrect &lt;- Vectorize(qCorrect)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YV9xYyA8LSBkYXRhICU+JVxuICAgICAgICAgICAgICBtdXRhdGVfYXQoXG4gICAgICAgICAgICAgICAgLnZhcnMgPSBjKFwiRTJcIiwgXCJFNFwiLCBcIkU2XCIsIFwiRThcIiwgXCJFMTBcIiwgXCJOMlwiLCBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgXCJONFwiLCBcIkExXCIsIFwiQTNcIiwgXCJBNVwiLCBcIkE3XCIsIFwiQzJcIiwgXG4gICAgICAgICAgICAgICAgICAgICAgICAgIFwiQzRcIiwgXCJDNlwiLCBcIkM4XCIsIFwiTzJcIiwgXCJPNFwiLCBcIk82XCIpLCBmdW5zKHFDb3JyZWN0KSkgJT4lXG4gICAgICAgICAgICAgIG11dGF0ZShzZXggPSBpZmVsc2UoZ2VuZGVyID09IDEsIDAsIDEpKSBcbiNzdHIoZGF0YV9xYylcbmBgYCJ9 -->
 <pre class="r"><code>data_qc &lt;- data %&gt;%
@@ -349,6 +221,7 @@ qCorrect &lt;- Vectorize(qCorrect)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>Calculate score based on 10 relevant questions to metric</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YV9ycyA8LSBkYXRhX3FjICU+JSBcbiAgICAgICAgICAgIG11dGF0ZShvX3N1bSA9IHJvd1N1bXMoLls4OjE3XSkpICAlPiVcbiAgICAgICAgICAgIG11dGF0ZShjX3N1bSA9IHJvd1N1bXMoLlsxODoyN10pKSAlPiUgXG4gICAgICAgICAgICBtdXRhdGUoZV9zdW0gPSByb3dTdW1zKC5bMjg6MzddKSkgJT4lIFxuICAgICAgICAgICAgbXV0YXRlKGFfc3VtID0gcm93U3VtcyguWzM4OjQ3XSkpICU+JVxuICAgICAgICAgICAgbXV0YXRlKG5fc3VtID0gcm93U3VtcyguWzQ4OjU3XSkpXG4jc3RyKGRhdGFfcnMpXG5gYGAifQ== -->
@@ -362,29 +235,51 @@ qCorrect &lt;- Vectorize(qCorrect)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>Calculate percentile scoring</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RyKGRhdGFfc2hhcGVkKVxuXG5gYGAifQ== -->
-<pre class="r"><code>str(data_shaped)
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiJ2RhdGEuZnJhbWUnOlx0MTk1OTMgb2JzLiBvZiAgMTEgdmFyaWFibGVzOlxuICQgc2V4ICA6IG51bSAgMCAxIDEgMSAxIDEgMSAwIDEgMSAuLi5cbiAkIG9fc3VtOiBudW0gIDQ0IDIyIDM1IDIyIDM0IDE2IDQ2IDM5IDQ1IDE1IC4uLlxuICQgY19zdW06IG51bSAgMTEgMzEgNDYgNDMgMzAgMjQgMjEgMTUgMzUgMzcgLi4uXG4gJCBlX3N1bTogbnVtICA0NiAzNSAzOCAzNyA0NCAzNiA0NSA0MSA0OSAzNSAuLi5cbiAkIGFfc3VtOiBudW0gIDQ3IDQyIDQ5IDI2IDM0IDMxIDI4IDQ0IDQxIDQwIC4uLlxuICQgbl9zdW06IG51bSAgNDMgMjYgNDUgNDEgMzQgMzMgNDEgNDIgNDEgNDEgLi4uXG4gJCBvX3BzIDogbnVtICAwLjkyMSAwLjE5MyAwLjY2NCAwLjE5MyAwLjYyNiAuLi5cbiAkIGNfcHMgOiBudW0gIDAuMDAzNTcgMC40NzYwNiAwLjk1NzAyIDAuOTA0OTYgMC40MzM5NSAuLi5cbiAkIGVfcHMgOiBudW0gIDAuODM0IDAuMjU4IDAuMzk2IDAuMzQ3IDAuNzM1IC4uLlxuICQgYV9wcyA6IG51bSAgMC45NjUgMC44NTIgMC45ODYgMC4xNDMgMC40OTUgLi4uXG4gJCBuX3BzIDogbnVtICAwLjY3NCAwLjAyMiAwLjc4NSAwLjU1OCAwLjE4OCAuLi5cbiJ9 -->
-<pre><code>'data.frame':   19593 obs. of  11 variables:
- $ sex  : num  0 1 1 1 1 1 1 0 1 1 ...
- $ o_sum: num  44 22 35 22 34 16 46 39 45 15 ...
- $ c_sum: num  11 31 46 43 30 24 21 15 35 37 ...
- $ e_sum: num  46 35 38 37 44 36 45 41 49 35 ...
- $ a_sum: num  47 42 49 26 34 31 28 44 41 40 ...
- $ n_sum: num  43 26 45 41 34 33 41 42 41 41 ...
- $ o_ps : num  0.921 0.193 0.664 0.193 0.626 ...
- $ c_ps : num  0.00357 0.47606 0.95702 0.90496 0.43395 ...
- $ e_ps : num  0.834 0.258 0.396 0.347 0.735 ...
- $ a_ps : num  0.965 0.852 0.986 0.143 0.495 ...
- $ n_ps : num  0.674 0.022 0.785 0.558 0.188 ...</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBGb3JtdWxhdGUgcHJvcGVyIGRhdGEgbW9kZWxcbnNldC5zZWVkKDUpXG5uIDwtIG5yb3coYmlnNSlcbmJpZzUgPC0gYmlnNVtzYW1wbGUobiksXSAjIFNodWZmbGUgZGF0YXNldFxuYmlnNSR4IDwtIGJpZzVbLDI6Nl0gIyBTZWxlY3Qgb25seSByZWxldmFudCBjb2x1bW5zXG5iaWc1JHkgPC0gdG9fY2F0ZWdvcmljYWwoYmlnNSRzZXgsIG51bV9jbGFzc2VzID0gMikgIyBDb252ZXJ0IHkgdG8gY2F0ZWdvcmljYWxcbiMgc3RyKGJpZzUpXG5gYGAifQ== -->
+<pre class="r"><code># Formulate proper data model
+set.seed(5)
+n &lt;- nrow(big5)
+big5 &lt;- big5[sample(n),] # Shuffle dataset
+big5$x &lt;- big5[,2:6] # Select only relevant columns
+big5$y &lt;- to_categorical(big5$sex, num_classes = 2) # Convert y to categorical
+# str(big5)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZXBvY2hzIDwtIDE1XG5cbnRyYWluX2luZGljZXMgPC0gMTpyb3VuZCgwLjcqbilcbnRyYWluX3ggPC0gYmlnNSR4W3RyYWluX2luZGljZXMsXVxudHJhaW5feSA8LSBiaWc1JHlbdHJhaW5faW5kaWNlcyxdXG5zdHIodHJhaW5feClcbnN0cih0cmFpbl95KVxuXG50ZXN0X2luZGljZXMgPC0gKHJvdW5kKDAuNypuKSsxKTpuXG50ZXN0X3ggPC0gYmlnNSR4W3Rlc3RfaW5kaWNlcyxdXG50ZXN0X3kgPC0gYmlnNSR5W3Rlc3RfaW5kaWNlcyxdXG5zdHIodGVzdF94KVxuc3RyKHRlc3RfeSlcblxuIyBNb2RlbCBjcmVhdGlvblxubW9kZWwgPC0ga2VyYXNfbW9kZWxfc2VxdWVudGlhbCgpXG5cbnN1bW1hcnkobW9kZWwpXG5gYGAifQ== -->
+<pre class="r"><code>epochs &lt;- 15
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkJpZyA1IE5vdGVib29rIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCmBgYHtyfQ0KbGlicmFyeSgidGlkeXZlcnNlIikNCmRhdGEgPC0gcmVhZC5jc3YoIi4vQklHNS9kYXRhLmNzdiIpICU+JSBmaWx0ZXIoZ2VuZGVyICVpbiUgYygxLDIpKQ0Kc3RyKGRhdGEpDQpzdW1tYXJ5KGRhdGEpDQpgYGANClRyYWl0IERlZmluaXRpb25zOg0KTzogTG93IE9wZW5uZXNzICAgICAgICAgICAtPiBIaWdoIE9wZW5uZXNzDQpDOiBMb3cgQ29uc2NpZW50aW91c25lc3MgIC0+IEhpZ2ggQ29uc2NpZW50aW91c25lc3MNCkU6IEludHJhdmVyc2lvbiAgICAgICAgICAgLT4gRXh0cmF2ZXJzaW9uDQpBOiBEaXNhZ3JlZWFibGVuZXNzICAgICAgIC0+IEFncmVlYWJsZW5lc3MNCk46IExvdyBOZXVyb3RpY2lzbSAgICAgICAgLT4gSGlnaCBOZXVyb3RpY2lzbSANCg0KRGVmaW5lIFIgZnVuY3Rpb24gdG8gY29ycmVjdCBmb3IgcXVlc3Rpb24gDQpgYGB7cn0NCnFDb3JyZWN0IDwtIGZ1bmN0aW9uKG4pew0KICBzd2l0Y2goYXMuY2hhcmFjdGVyKG4pLA0KICAgICAgICAgJzEnID0gNSwNCiAgICAgICAgICcyJyA9IDQsDQogICAgICAgICAnMycgPSAzLA0KICAgICAgICAgJzQnID0gMiwNCiAgICAgICAgICc1JyA9IDEsIDApDQp9DQpxQ29ycmVjdCA8LSBWZWN0b3JpemUocUNvcnJlY3QpDQpgYGANCg0KYGBge3J9DQpkYXRhX3FjIDwtIGRhdGEgJT4lDQogICAgICAgICAgICAgIG11dGF0ZV9hdCgNCiAgICAgICAgICAgICAgICAudmFycyA9IGMoIkUyIiwgIkU0IiwgIkU2IiwgIkU4IiwgIkUxMCIsICJOMiIsIA0KICAgICAgICAgICAgICAgICAgICAgICAgICAiTjQiLCAiQTEiLCAiQTMiLCAiQTUiLCAiQTciLCAiQzIiLCANCiAgICAgICAgICAgICAgICAgICAgICAgICAgIkM0IiwgIkM2IiwgIkM4IiwgIk8yIiwgIk80IiwgIk82IiksIGZ1bnMocUNvcnJlY3QpKSAlPiUNCiAgICAgICAgICAgICAgbXV0YXRlKHNleCA9IGlmZWxzZShnZW5kZXIgPT0gMSwgMCwgMSkpIA0KI3N0cihkYXRhX3FjKQ0KYGBgDQoNCmBgYHtyfQ0KZGF0YV9ycyA8LSBkYXRhX3FjICU+JSANCiAgICAgICAgICAgIG11dGF0ZShvX3N1bSA9IHJvd1N1bXMoLls4OjE3XSkpICAlPiUNCiAgICAgICAgICAgIG11dGF0ZShjX3N1bSA9IHJvd1N1bXMoLlsxODoyN10pKSAlPiUgDQogICAgICAgICAgICBtdXRhdGUoZV9zdW0gPSByb3dTdW1zKC5bMjg6MzddKSkgJT4lIA0KICAgICAgICAgICAgbXV0YXRlKGFfc3VtID0gcm93U3VtcyguWzM4OjQ3XSkpICU+JQ0KICAgICAgICAgICAgbXV0YXRlKG5fc3VtID0gcm93U3VtcyguWzQ4OjU3XSkpDQojc3RyKGRhdGFfcnMpDQpgYGANCg0KYGBge3J9DQpkYXRhX3BzIDwtIGRhdGFfcnMgJT4lICANCiAgICAgICAgICAgIG11dGF0ZShvX3BzID0gcGVyY2VudF9yYW5rKG9fc3VtKSkgJT4lDQogICAgICAgICAgICBtdXRhdGUoY19wcyA9IHBlcmNlbnRfcmFuayhjX3N1bSkpICU+JQ0KICAgICAgICAgICAgbXV0YXRlKGVfcHMgPSBwZXJjZW50X3JhbmsoZV9zdW0pKSAlPiUNCiAgICAgICAgICAgIG11dGF0ZShhX3BzID0gcGVyY2VudF9yYW5rKGFfc3VtKSkgJT4lDQogICAgICAgICAgICBtdXRhdGUobl9wcyA9IHBlcmNlbnRfcmFuayhuX3N1bSkpDQpkYXRhX3NoYXBlZCA8LSBkYXRhX3BzWyxjKDU4OjY4KV0NCnN0cihkYXRhX3NoYXBlZCkNCmBgYA0K</div>
+train_indices &lt;- 1:round(0.7*n)
+train_x &lt;- big5$x[train_indices,]
+train_y &lt;- big5$y[train_indices,]
+str(train_x)
+str(train_y)
+
+test_indices &lt;- (round(0.7*n)+1):n
+test_x &lt;- big5$x[test_indices,]
+test_y &lt;- big5$y[test_indices,]
+str(test_x)
+str(test_y)
+
+# Model creation
+model &lt;- keras_model_sequential()
+
+summary(model)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkJpZyA1IE5vdGVib29rIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCmBgYHtyfQ0KbGlicmFyeSgidGlkeXZlcnNlIikNCmxpYnJhcnkoImtlcmFzIikNCmRhdGEgPC0gcmVhZC5jc3YoIi4vQklHNS9kYXRhLmNzdiIpICU+JSANCiAgZmlsdGVyKGdlbmRlciAlaW4lIGMoMSwyKSkNCmRhdGFfZ3UgPC0gcmVhZC5jc3YoIi4vQklHNS9kYXRhLmNzdiIpICU+JSANCiAgZmlsdGVyKGdlbmRlciAlaW4lIGMoMykpDQojc3RyKGRhdGEpDQojc3VtbWFyeShkYXRhKQ0KYGBgDQpPbmx5IHNlbGVjdCByb3dzIHdpdGggcHJlZGljdGFibGUgZ2VuZGVycy4gTm9uLXNwZWNpZmllZCBjb3VsZCBhbHNvIGJlIGNvbnNpZGVyZWQgaWYgdGhlcmUgd2VyZSBtb3JlIHNhbXBsZXMsIGJ1dCBhdCB0aGUgdGltZSBvZiB3cml0aW5nIHRoaXMgb25seSAqKjEwMioqIG9ic2VydmF0aW9ucyBhcmUgcHJlc2VudCBpbiB0aGUgZGF0YSBzZXQuICANCg0KVHJhaXQgRGVmaW5pdGlvbnM6ICANCk86IExvdyBPcGVubmVzcyAgICAgICAgICAgLT4gSGlnaCBPcGVubmVzcyAgDQpDOiBMb3cgQ29uc2NpZW50aW91c25lc3MgIC0+IEhpZ2ggQ29uc2NpZW50aW91c25lc3MgICANCkU6IEludHJhdmVyc2lvbiAgICAgICAgICAgLT4gRXh0cmF2ZXJzaW9uICANCkE6IERpc2FncmVlYWJsZW5lc3MgICAgICAgLT4gQWdyZWVhYmxlbmVzcyAgDQpOOiBMb3cgTmV1cm90aWNpc20gICAgICAgIC0+IEhpZ2ggTmV1cm90aWNpc20gICANCg0KRGVmaW5lIFIgZnVuY3Rpb24gdG8gY29ycmVjdCBmb3IgcXVlc3Rpb24gDQpgYGB7cn0NCnFDb3JyZWN0IDwtIGZ1bmN0aW9uKG4pew0KICBzd2l0Y2goYXMuY2hhcmFjdGVyKG4pLA0KICAgICAgICAgJzEnID0gNSwNCiAgICAgICAgICcyJyA9IDQsDQogICAgICAgICAnMycgPSAzLA0KICAgICAgICAgJzQnID0gMiwNCiAgICAgICAgICc1JyA9IDEsIDApDQp9DQpxQ29ycmVjdCA8LSBWZWN0b3JpemUocUNvcnJlY3QpICMgVmVjdG9yaXplIGZ1bmN0aW9uIHRvIGFsbG93IGludGVyb3BlcmF0aW9uIHdpdGggZHBseXI6Om11dGF0ZQ0KYGBgDQpgYGB7cn0NCmRhdGFfcWMgPC0gZGF0YSAlPiUNCiAgICAgICAgICAgICAgbXV0YXRlX2F0KA0KICAgICAgICAgICAgICAgIC52YXJzID0gYygiRTIiLCAiRTQiLCAiRTYiLCAiRTgiLCAiRTEwIiwgIk4yIiwgDQogICAgICAgICAgICAgICAgICAgICAgICAgICJONCIsICJBMSIsICJBMyIsICJBNSIsICJBNyIsICJDMiIsIA0KICAgICAgICAgICAgICAgICAgICAgICAgICAiQzQiLCAiQzYiLCAiQzgiLCAiTzIiLCAiTzQiLCAiTzYiKSwgZnVucyhxQ29ycmVjdCkpICU+JQ0KICAgICAgICAgICAgICBtdXRhdGUoc2V4ID0gaWZlbHNlKGdlbmRlciA9PSAxLCAwLCAxKSkgDQojc3RyKGRhdGFfcWMpDQpgYGANCkNhbGN1bGF0ZSBzY29yZSBiYXNlZCBvbiAxMCByZWxldmFudCBxdWVzdGlvbnMgdG8gbWV0cmljDQpgYGB7cn0NCmRhdGFfcnMgPC0gZGF0YV9xYyAlPiUgDQogICAgICAgICAgICBtdXRhdGUob19zdW0gPSByb3dTdW1zKC5bODoxN10pKSAgJT4lDQogICAgICAgICAgICBtdXRhdGUoY19zdW0gPSByb3dTdW1zKC5bMTg6MjddKSkgJT4lIA0KICAgICAgICAgICAgbXV0YXRlKGVfc3VtID0gcm93U3VtcyguWzI4OjM3XSkpICU+JSANCiAgICAgICAgICAgIG11dGF0ZShhX3N1bSA9IHJvd1N1bXMoLlszODo0N10pKSAlPiUNCiAgICAgICAgICAgIG11dGF0ZShuX3N1bSA9IHJvd1N1bXMoLls0ODo1N10pKQ0KI3N0cihkYXRhX3JzKQ0KYGBgDQpDYWxjdWxhdGUgcGVyY2VudGlsZSBzY29yaW5nDQpgYGB7cn0NCmRhdGFfcHMgPC0gZGF0YV9ycyAlPiUNCiAgICAgICAgICAgICMgbXV0YXRlX2F0KC52YXJzID0gYygib19zdW0iLCJjX3N1bSIsImVfc3VtIiwiYV9zdW0iLCJuX3N1bSIpLCBmdW5zKHBlcmNlbnRfcmFuaykpIA0KICAgICAgICAgICAgIyBDYW4gcmVwbGljYXRlIHRoZSBiZWxvdyBmdW5jdGlvbmFsaXR5IHdpdGggdGhlIGFib3ZlIGxpbmUsIGJ1dCB0aGlzIG92ZXJ3cml0ZXMgdGhlIGNvbHVtbnMNCiAgICAgICAgICAgIG11dGF0ZShvX3BzID0gcGVyY2VudF9yYW5rKG9fc3VtKSkgJT4lDQogICAgICAgICAgICBtdXRhdGUoY19wcyA9IHBlcmNlbnRfcmFuayhjX3N1bSkpICU+JQ0KICAgICAgICAgICAgbXV0YXRlKGVfcHMgPSBwZXJjZW50X3JhbmsoZV9zdW0pKSAlPiUNCiAgICAgICAgICAgIG11dGF0ZShhX3BzID0gcGVyY2VudF9yYW5rKGFfc3VtKSkgJT4lDQogICAgICAgICAgICBtdXRhdGUobl9wcyA9IHBlcmNlbnRfcmFuayhuX3N1bSkpDQoNCmRhdGFfc2hhcGVkIDwtIGRhdGFfcHNbLGMoNTg6NjgpXSAjIHN1bXMsIHBlcmNlbnQgc2NvcmVzLCBhbmQgc2V4IGlkDQpiaWc1IDwtIGRhdGFfcHNbLGMoNTgsNjQ6NjgpXSAjIHBlcmNlbnQgc2NvcmVzIGFuZCBzZXggaWQNCiMgc3RyKGRhdGFfc2hhcGVkKQ0KYGBgDQoNCmBgYHtyfQ0KIyBGb3JtdWxhdGUgcHJvcGVyIGRhdGEgbW9kZWwNCnNldC5zZWVkKDUpDQpuIDwtIG5yb3coYmlnNSkNCmJpZzUgPC0gYmlnNVtzYW1wbGUobiksXSAjIFNodWZmbGUgZGF0YXNldA0KYmlnNSR4IDwtIGJpZzVbLDI6Nl0gIyBTZWxlY3Qgb25seSByZWxldmFudCBjb2x1bW5zDQpiaWc1JHkgPC0gdG9fY2F0ZWdvcmljYWwoYmlnNSRzZXgsIG51bV9jbGFzc2VzID0gMikgIyBDb252ZXJ0IHkgdG8gY2F0ZWdvcmljYWwNCiMgc3RyKGJpZzUpDQpgYGANCg0KYGBge3J9DQplcG9jaHMgPC0gMTUNCg0KdHJhaW5faW5kaWNlcyA8LSAxOnJvdW5kKDAuNypuKQ0KdHJhaW5feCA8LSBiaWc1JHhbdHJhaW5faW5kaWNlcyxdDQp0cmFpbl95IDwtIGJpZzUkeVt0cmFpbl9pbmRpY2VzLF0NCnN0cih0cmFpbl94KQ0Kc3RyKHRyYWluX3kpDQoNCnRlc3RfaW5kaWNlcyA8LSAocm91bmQoMC43Km4pKzEpOm4NCnRlc3RfeCA8LSBiaWc1JHhbdGVzdF9pbmRpY2VzLF0NCnRlc3RfeSA8LSBiaWc1JHlbdGVzdF9pbmRpY2VzLF0NCnN0cih0ZXN0X3gpDQpzdHIodGVzdF95KQ0KDQojIE1vZGVsIGNyZWF0aW9uDQptb2RlbCA8LSBrZXJhc19tb2RlbF9zZXF1ZW50aWFsKCkNCg0Kc3VtbWFyeShtb2RlbCkNCmBgYA0KDQo=</div>
 
 
 

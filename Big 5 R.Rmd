@@ -4,16 +4,22 @@ output: html_notebook
 ---
 ```{r}
 library("tidyverse")
-data <- read.csv("./BIG5/data.csv") %>% filter(gender %in% c(1,2))
-str(data)
-summary(data)
+library("keras")
+data <- read.csv("./BIG5/data.csv") %>% 
+  filter(gender %in% c(1,2))
+data_gu <- read.csv("./BIG5/data.csv") %>% 
+  filter(gender %in% c(3))
+#str(data)
+#summary(data)
 ```
-Trait Definitions:
-O: Low Openness           -> High Openness
-C: Low Conscientiousness  -> High Conscientiousness
-E: Intraversion           -> Extraversion
-A: Disagreeableness       -> Agreeableness
-N: Low Neuroticism        -> High Neuroticism 
+Only select rows with predictable genders. Non-specified could also be considered if there were more samples, but at the time of writing this only **102** observations are present in the data set.  
+
+Trait Definitions:  
+O: Low Openness           -> High Openness  
+C: Low Conscientiousness  -> High Conscientiousness   
+E: Intraversion           -> Extraversion  
+A: Disagreeableness       -> Agreeableness  
+N: Low Neuroticism        -> High Neuroticism   
 
 Define R function to correct for question 
 ```{r}
@@ -25,9 +31,8 @@ qCorrect <- function(n){
          '4' = 2,
          '5' = 1, 0)
 }
-qCorrect <- Vectorize(qCorrect)
+qCorrect <- Vectorize(qCorrect) # Vectorize function to allow interoperation with dplyr::mutate
 ```
-
 ```{r}
 data_qc <- data %>%
               mutate_at(
@@ -37,7 +42,7 @@ data_qc <- data %>%
               mutate(sex = ifelse(gender == 1, 0, 1)) 
 #str(data_qc)
 ```
-
+Calculate score based on 10 relevant questions to metric
 ```{r}
 data_rs <- data_qc %>% 
             mutate(o_sum = rowSums(.[8:17]))  %>%
@@ -47,14 +52,50 @@ data_rs <- data_qc %>%
             mutate(n_sum = rowSums(.[48:57]))
 #str(data_rs)
 ```
-
+Calculate percentile scoring
 ```{r}
-data_ps <- data_rs %>%  
+data_ps <- data_rs %>%
+            # mutate_at(.vars = c("o_sum","c_sum","e_sum","a_sum","n_sum"), funs(percent_rank)) 
+            # Can replicate the below functionality with the above line, but this overwrites the columns
             mutate(o_ps = percent_rank(o_sum)) %>%
             mutate(c_ps = percent_rank(c_sum)) %>%
             mutate(e_ps = percent_rank(e_sum)) %>%
             mutate(a_ps = percent_rank(a_sum)) %>%
             mutate(n_ps = percent_rank(n_sum))
-data_shaped <- data_ps[,c(58:68)]
-str(data_shaped)
+
+data_shaped <- data_ps[,c(58:68)] # sums, percent scores, and sex id
+big5 <- data_ps[,c(58,64:68)] # percent scores and sex id
+# str(data_shaped)
 ```
+
+```{r}
+# Formulate proper data model
+set.seed(5)
+n <- nrow(big5)
+big5 <- big5[sample(n),] # Shuffle dataset
+big5$x <- big5[,2:6] # Select only relevant columns
+big5$y <- to_categorical(big5$sex, num_classes = 2) # Convert y to categorical
+# str(big5)
+```
+
+```{r}
+epochs <- 15
+
+train_indices <- 1:round(0.7*n)
+train_x <- big5$x[train_indices,]
+train_y <- big5$y[train_indices,]
+str(train_x)
+str(train_y)
+
+test_indices <- (round(0.7*n)+1):n
+test_x <- big5$x[test_indices,]
+test_y <- big5$y[test_indices,]
+str(test_x)
+str(test_y)
+
+# Model creation
+model <- keras_model_sequential()
+
+summary(model)
+```
+
