@@ -1,36 +1,42 @@
 ---
-title: "R Notebook"
+title: "Big 5 Notebook"
 output: html_notebook
 ---
-
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
-
 ```{r}
 library("tidyverse")
 data <- read.csv("./BIG5/data.csv")
-str(data)
+#str(data)
 #summary(data)
 ```
 
 ```{r}
-data_o <- data[8:17]
-data_c <- data[18:27]
-data_e <- data[28:37]
-data_a <- data[38:47]
-data_n <- data[48:57]
-str(data_o)
-str(data_c)
-str(data_e)
-str(data_a)
-str(data_n)
-```
+# data_o <- data[8:17]
+# data_c <- data[18:27]
+# data_e <- data[28:37]
+# data_a <- data[38:47]
+# data_n <- data[48:57]
+# str(data_o)
+# str(data_c)
+# str(data_e)
+# str(data_a)
+# str(data_n)
 
+data_rs <- data %>% 
+            mutate(o_sum = rowSums(.[8:17]))  %>%
+            mutate(c_sum = rowSums(.[18:27])) %>% 
+            mutate(e_sum = rowSums(.[28:37])) %>% 
+            mutate(a_sum = rowSums(.[38:47])) %>%
+            mutate(n_sum = rowSums(.[48:57]))
+str(data_rs)
+```
 ```{r}
+data_ps <- data_rs %>%
+            mutate(o_ps = percent_rank(.[o_sum]))  %>%
+            mutate(c_ps = percent_rank(.[c_sum])) %>% 
+            mutate(e_ps = percent_rank(.[e_sum])) %>% 
+            mutate(a_ps = percent_rank(.[a_sum])) %>%
+            mutate(n_ps = percent_rank(.[n_sum]))
+
 
 
 ```
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
