@@ -4,39 +4,57 @@ output: html_notebook
 ---
 ```{r}
 library("tidyverse")
-data <- read.csv("./BIG5/data.csv")
-#str(data)
-#summary(data)
+data <- read.csv("./BIG5/data.csv") %>% filter(gender %in% c(1,2))
+str(data)
+summary(data)
+```
+Trait Definitions:
+O: Low Openness           -> High Openness
+C: Low Conscientiousness  -> High Conscientiousness
+E: Intraversion           -> Extraversion
+A: Disagreeableness       -> Agreeableness
+N: Low Neuroticism        -> High Neuroticism 
+
+Define R function to correct for question 
+```{r}
+qCorrect <- function(n){
+  switch(as.character(n),
+         '1' = 5,
+         '2' = 4,
+         '3' = 3,
+         '4' = 2,
+         '5' = 1, 0)
+}
+qCorrect <- Vectorize(qCorrect)
 ```
 
 ```{r}
-# data_o <- data[8:17]
-# data_c <- data[18:27]
-# data_e <- data[28:37]
-# data_a <- data[38:47]
-# data_n <- data[48:57]
-# str(data_o)
-# str(data_c)
-# str(data_e)
-# str(data_a)
-# str(data_n)
+data_qc <- data %>%
+              mutate_at(
+                .vars = c("E2", "E4", "E6", "E8", "E10", "N2", 
+                          "N4", "A1", "A3", "A5", "A7", "C2", 
+                          "C4", "C6", "C8", "O2", "O4", "O6"), funs(qCorrect)) %>%
+              mutate(sex = ifelse(gender == 1, 0, 1)) 
+#str(data_qc)
+```
 
-data_rs <- data %>% 
+```{r}
+data_rs <- data_qc %>% 
             mutate(o_sum = rowSums(.[8:17]))  %>%
             mutate(c_sum = rowSums(.[18:27])) %>% 
             mutate(e_sum = rowSums(.[28:37])) %>% 
             mutate(a_sum = rowSums(.[38:47])) %>%
             mutate(n_sum = rowSums(.[48:57]))
-str(data_rs)
+#str(data_rs)
 ```
+
 ```{r}
-data_ps <- data_rs %>%
-            mutate(o_ps = percent_rank(.[o_sum]))  %>%
-            mutate(c_ps = percent_rank(.[c_sum])) %>% 
-            mutate(e_ps = percent_rank(.[e_sum])) %>% 
-            mutate(a_ps = percent_rank(.[a_sum])) %>%
-            mutate(n_ps = percent_rank(.[n_sum]))
-
-
-
+data_ps <- data_rs %>%  
+            mutate(o_ps = percent_rank(o_sum)) %>%
+            mutate(c_ps = percent_rank(c_sum)) %>%
+            mutate(e_ps = percent_rank(e_sum)) %>%
+            mutate(a_ps = percent_rank(a_sum)) %>%
+            mutate(n_ps = percent_rank(n_sum))
+data_shaped <- data_ps[,c(58:68)]
+str(data_shaped)
 ```
