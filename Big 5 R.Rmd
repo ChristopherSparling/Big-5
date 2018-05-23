@@ -74,54 +74,75 @@ set.seed(5)
 n <- nrow(big5)
 big5 <- big5[sample(n),] # Shuffle dataset
 big5$x <- big5[,2:6] # Select only relevant columns
-big5$y <- to_categorical(big5$sex, num_classes = 2) # Convert y to categorical
-# str(big5)
+big5$y <- big5$sex # Convert y to categorical
 ```
 
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
-epochs <- 15
-batch_size = 25
-output_units = 
 # Create training and testing sets
   # No cross validation set in this deep-learning model, but could be implemented in the future
 train_indices <- 1:round(0.7*n)
-train_x <- data.matrix(big5$x[train_indices,])
-train_y <- data.matrix(big5$y[train_indices,])
+train_x <- scale(data.matrix(big5$x[train_indices,]))
+train_y <- big5$y[train_indices]
 str(train_x)
 str(train_y)
 
 test_indices <- (round(0.7*n)+1):n
-test_x <- big5$x[test_indices,]
-test_y <- big5$y[test_indices,]
+test_x <- scale(data.matrix(big5$x[test_indices,]))
+test_y <- big5$y[test_indices]
 str(test_x)
 str(test_y)
 
-# Model creation
-inputs <- layer_input(shape = c(5))
-model <- keras_model_sequential()
+train_subset_indices <- 1:50
+train_x_subset <- scale(data.matrix(big5$x[train_subset_indices,]))
+train_y_subset <- big5$y[train_subset_indices]
+str(train_x_subset)
+str(train_y_subset)
+```
 
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+# Model initialization
+epochs <- 50
+batch_size <- 5
+initializer_random_normal() # Initial weighting initialization
+
+model <- keras_model_sequential()
 model %>%
-  layer_dense(units = 7, input_shape = 5, name = "Input_Layer") %>%
-  layer_activation(activation = 'relu') %>%
-  layer_dense(units = 5, name = "Dense_2") %>%
-  layer_activation(activation = 'relu') %>%
-  layer_dense(units = 7, name = "Dense_3") %>%
-  layer_activation(activation = 'softmax')
+  layer_dense(units = 5, 
+              input_shape = c(5), 
+              name = "Input_Layer") %>% #,kernel_regularizer = regularizer_l1()
+  layer_activation(activation = 'sigmoid') %>%
+  layer_dense(units = 7,
+              name = "Dense_4") %>% #,kernel_regularizer = regularizer_l1()
+  layer_activation(activation = 'sigmoid')
 
 model %>% compile(
   loss = loss_binary_crossentropy,
-  optimizer = rmsprop,
-  metrics = metric_binary_accuracy
+  optimizer = optimizer_rmsprop(lr = 0.1, decay = 0.001), # Modified learning rate, being checked in logarithmic steps
+  metrics = metric_binary_accuracy 
 )
 
-model %>% fit(
-  x = train_x, y = train_y,
-  batch_size = batch_size,
+validation_model <- model
+validation_model %>% fit(
+  x = train_x_subset, y = train_y_subset,
   epochs = epochs,
-  verbose = 2,
-  validation_split = 0.1
+  batch_size = batch_size,
+  verbose = 2
 )  
-  
-summary(model)
+#summary(validation_model)
+# model %>% fit(
+#   x = train_x, y = train_y,
+#   epochs = epochs,
+#   batch_size = batch_size,
+#   verbose = 2
+# )  
 ```
 
+```{r}
+validation_model %>% evaluate(test_x, test_y, verbose = 0)
+model %>% evaluate(test_x, test_y, verbose = 0)
+
+```
+References:
+https://engineering.semantics3.com/debugging-neural-networks-a-checklist-ca52e11151ec
+https://keras.rstudio.com/articles/functional_api.html#multi-input-and-multi-output-models
+https://towardsdatascience.com/l1-and-l2-regularization-methods-ce25e7fc831c
