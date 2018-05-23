@@ -116,22 +116,87 @@ test_indices_a <- (round(0.8*n)+1):n
 train_a <- big5_a[train_indices_a,]
 cv_a <- big5_a[cv_indices_a,]
 test_a <- big5_a[test_indices_a,]
-str(train_a)
 str(cv_a)
+str(train_a)
 str(test_a)
 
 ```
 
 Mixture Discriminant Analysis
-```{r}
+```{r, message=FALSE, warning=FALSE, include=FALSE}
 mda_fit <- mda(sex~., data = train_a)
 summary(mda_fit)
-mda_predictions <-predict(fit,test_a[,2:6])
+mda_predictions <-predict(mda_fit,test_a[,2:6])
 pred_table <-table(mda_predictions,test_a$sex)
 confusionMatrix(as.factor(mda_predictions),as.factor(test_a$sex))
-str(pred_table)
-pred_table
-pred_table[4]
+# 0.6642 accuracy
+```
+
+Quadratic Discriminant Analysis
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+qda_fit <- qda(sex~., data = train_a)
+summary(qda_fit)
+qda_predictions <-predict(qda_fit,test_a[,2:6])$class
+confusionMatrix(as.factor(qda_predictions),as.factor(test_a$sex))
+# 0.6675 accuracy
+```
+
+Regularized Discriminant Analysis
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+rda_fit <- rda(sex~., data = train_a, gamma = 0.05, lambda = 0.01)
+summary(qda_fit)
+rda_predictions <-predict(rda_fit,test_a[,2:6])$class
+confusionMatrix(as.factor(rda_predictions),as.factor(test_a$sex))
+# 0.667 accuracy
+```
+
+Neural Net
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+nnet_fit <- nnet(as.factor(sex)~., data=train_a, size=4, decay=0.0001, maxit=500)
+summary(nnet_fit)
+str(nnet_fit)
+
+nnet_predictions <-predict(nnet_fit,test_a[,2:6], type='class')
+confusionMatrix(as.factor(nnet_predictions),as.factor(test_a$sex))
+# 0.6693 accuracy
+```
+
+Flexible Discriminant Analysis
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+fda_fit <- fda(as.factor(sex)~., data=train_a)
+summary(fda_fit)
+str(fda_fit)
+
+fda_predictions <-predict(fda_fit,test_a[,2:6])
+confusionMatrix(as.factor(fda_predictions),as.factor(test_a$sex))
+# 0.666 accuracy
+```
+
+Support Vector Machine
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+svm_fit <- ksvm(as.factor(sex)~., data=train_a)
+svm_predictions <- predict(svm_fit, test_a[,2:6], type='response')
+table(svm_predictions, test_a$sex)
+confusionMatrix(as.factor(svm_predictions),as.factor(test_a$sex))
+# 0.6721 accuracy
+```
+
+k-Nearest Neighbours
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+knn_fit <- knn3(as.factor(sex)~., data=train_a, k = 10)
+knn_predictions <- predict(knn_fit, test_a[,2:6], type='class')
+table(knn_predictions, test_a$sex)
+confusionMatrix(as.factor(knn_predictions),as.factor(test_a$sex))
+# 0.6295 accuracy
+```
+
+Naive Bayes
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+nb_fit <- naiveBayes(as.factor(sex)~., data=train_a)
+nb_predictions <- predict(nb_fit, test_a[,2:6], type='class')
+table(nb_predictions, test_a$sex)
+confusionMatrix(as.factor(nb_predictions),as.factor(test_a$sex))
+# 0.6675 accuracy
 ```
 
 Neural Network Model using 'keras' package
@@ -146,7 +211,7 @@ model %>%
   layer_dense(units = 5, 
               input_shape = c(5), 
               name = "Input_Layer") %>%
-  layer_activation(activation = 'sigmoid') %>%
+  layer_activation(activation = 'sigmoid') %>%3
   layer_dense(units = 7,
               name = "Dense_2",
               kernel_regularizer = ) %>%
