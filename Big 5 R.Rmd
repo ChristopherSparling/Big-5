@@ -3,8 +3,18 @@ title: "Big 5 Notebook"
 output: html_notebook
 ---
 ```{r}
+library('mda')
+library('MASS')
+library('klaR')
+library('nnet')
+library('kernlab')
+library('caret')
+library('e1071')
 library("tidyverse")
 library("keras")
+```
+
+```{r}
 data <- read.csv("./BIG5/data.csv") %>% 
   filter(gender %in% c(1,2))
 data_gu <- read.csv("./BIG5/data.csv") %>% 
@@ -12,7 +22,7 @@ data_gu <- read.csv("./BIG5/data.csv") %>%
 #str(data)
 #summary(data)
 ```
-Only select rows with predictable genders. Non-specified could also be considered if there were more samples, but at the time of writing this only **102** observations are present in the data set.  
+Only select rows with predictable genders. Non-specified could also be considered if there were more samples, but at the time of writing this only **102** observations are present in the data set. In the original question set several questions were posed such that they measured the low-end of the trait rather than the high end. These values have been reversed.
 
 Trait Definitions:  
 O: Low Openness           -> High Openness  
@@ -72,7 +82,9 @@ big5 <- data_ps[,c(58,64:68)] # percent scores and sex id
 # Formulate proper data model
 set.seed(5)
 n <- nrow(big5)
-big5 <- big5[sample(n),] # Shuffle dataset
+big5_a <- big5[sample(n),] # Shuffle dataset
+str(big5_a)
+big5 <- big5_a
 big5$x <- big5[,2:6] # Select only relevant columns
 big5$y <- big5$sex # Convert y to categorical
 ```
@@ -97,44 +109,87 @@ train_x_subset <- scale(data.matrix(big5$x[train_subset_indices,]))
 train_y_subset <- big5$y[train_subset_indices]
 str(train_x_subset)
 str(train_y_subset)
+
+train_indices_a <- 1:round(0.65*n)
+cv_indices_a <- (round(0.65*n)+1):round(0.8*n)
+test_indices_a <- (round(0.8*n)+1):n
+train_a <- big5_a[train_indices_a,]
+cv_a <- big5_a[cv_indices_a,]
+test_a <- big5_a[test_indices_a,]
+str(train_a)
+str(cv_a)
+str(test_a)
+
 ```
 
+Mixture Discriminant Analysis
+```{r}
+mda_fit <- mda(sex~., data = train_a)
+summary(mda_fit)
+mda_predictions <-predict(fit,test_a[,2:6])
+pred_table <-table(mda_predictions,test_a$sex)
+confusionMatrix(as.factor(mda_predictions),as.factor(test_a$sex))
+str(pred_table)
+pred_table
+pred_table[4]
+```
+
+Neural Network Model using 'keras' package
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
 # Model initialization
-epochs <- 50
-batch_size <- 5
+epochs <- 15
+batch_size <- 15
 initializer_random_normal() # Initial weighting initialization
 
 model <- keras_model_sequential()
 model %>%
   layer_dense(units = 5, 
               input_shape = c(5), 
-              name = "Input_Layer") %>% #,kernel_regularizer = regularizer_l1()
+              name = "Input_Layer") %>%
   layer_activation(activation = 'sigmoid') %>%
   layer_dense(units = 7,
-              name = "Dense_4") %>% #,kernel_regularizer = regularizer_l1()
+              name = "Dense_2",
+              kernel_regularizer = ) %>%
+  layer_activation(activation = 'relu') %>%
+  layer_dense(units = 7) %>%
   layer_activation(activation = 'sigmoid')
 
 model %>% compile(
   loss = loss_binary_crossentropy,
-  optimizer = optimizer_rmsprop(lr = 0.1, decay = 0.001), # Modified learning rate, being checked in logarithmic steps
+  optimizer = optimizer_rmsprop(lr = 0.01), # Modified learning rate, being checked in logarithmic steps
   metrics = metric_binary_accuracy 
 )
 
-validation_model <- model
-validation_model %>% fit(
-  x = train_x_subset, y = train_y_subset,
-  epochs = epochs,
-  batch_size = batch_size,
-  verbose = 2
-)  
-#summary(validation_model)
-# model %>% fit(
-#   x = train_x, y = train_y,
+# validation_model <- model
+# validation_model %>% fit(
+#   x = train_x_subset, y = train_y_subset,
 #   epochs = epochs,
 #   batch_size = batch_size,
 #   verbose = 2
 # )  
+#summary(validation_model)
+
+model %>% fit(
+  x = train_x, y = train_y,
+  epochs = epochs,
+  batch_size = batch_size,
+  verbose = 2,
+  validation_split = 0.1
+)
+
+```
+
+```{r}
+weightHistory <- R6::R6Class("weightHistory",
+  inherit = KerasCallback,
+  public = list(
+    weights = NULL,
+    on_batch_end = function(batch, logs = list()) {
+      for(i in 1:3){
+        var(self$weights[[i]],1)
+      }
+    }
+))
 ```
 
 ```{r}
@@ -146,3 +201,4 @@ References:
 https://engineering.semantics3.com/debugging-neural-networks-a-checklist-ca52e11151ec
 https://keras.rstudio.com/articles/functional_api.html#multi-input-and-multi-output-models
 https://towardsdatascience.com/l1-and-l2-regularization-methods-ce25e7fc831c
+https://machinelearningmastery.com/non-linear-classification-in-r/
