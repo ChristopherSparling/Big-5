@@ -83,6 +83,7 @@ big5 <- data_ps[,c(58,64:68)] # percent scores and sex id
 set.seed(5)
 n <- nrow(big5)
 big5_a <- big5[sample(n),] # Shuffle dataset
+#big5_a <- big5 # Unshuffed dataset
 str(big5_a)
 big5 <- big5_a
 big5$x <- big5[,2:6] # Select only relevant columns
@@ -92,13 +93,13 @@ big5$y <- big5$sex # Convert y to categorical
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
 # Create training and testing sets
   # No cross validation set in this deep-learning model, but could be implemented in the future
-train_indices <- 1:round(0.7*n)
+train_indices <- 2:round(0.7*n)
 train_x <- scale(data.matrix(big5$x[train_indices,]))
 train_y <- big5$y[train_indices]
 str(train_x)
 str(train_y)
 
-test_indices <- (round(0.7*n)+1):n
+test_indices <- c(1,(round(0.7*n)+1):n)
 test_x <- scale(data.matrix(big5$x[test_indices,]))
 test_y <- big5$y[test_indices]
 str(test_x)
@@ -110,9 +111,9 @@ train_y_subset <- big5$y[train_subset_indices]
 str(train_x_subset)
 str(train_y_subset)
 
-train_indices_a <- 1:round(0.65*n)
+train_indices_a <- 2:round(0.65*n)
 cv_indices_a <- (round(0.65*n)+1):round(0.8*n)
-test_indices_a <- (round(0.8*n)+1):n
+test_indices_a <- c(1,(round(0.8*n)+1):n)
 train_a <- big5_a[train_indices_a,]
 cv_a <- big5_a[cv_indices_a,]
 test_a <- big5_a[test_indices_a,]
@@ -129,6 +130,7 @@ summary(mda_fit)
 mda_predictions <-predict(mda_fit,test_a[,2:6])
 pred_table <-table(mda_predictions,test_a$sex)
 confusionMatrix(as.factor(mda_predictions),as.factor(test_a$sex))
+mda_predictions
 # 0.6642 accuracy
 ```
 
@@ -138,6 +140,7 @@ qda_fit <- qda(sex~., data = train_a)
 summary(qda_fit)
 qda_predictions <-predict(qda_fit,test_a[,2:6])$class
 confusionMatrix(as.factor(qda_predictions),as.factor(test_a$sex))
+qda_predictions
 # 0.6675 accuracy
 ```
 
