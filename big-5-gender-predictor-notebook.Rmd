@@ -21,13 +21,16 @@ data <- read.csv("./data/data.csv") %>%
   filter(gender %in% c(1,2)) # General dataset
 c_data <- read.csv("./data/custom_data.csv") # Custom user dataset
 num_cust_data <- nrow(c_data) # Track number of custom user entries in the dataset
-str(data)
-summary(data)
-
+cust_preds <- data.frame(name = c_data[1:num_cust_data,"name"])
+cust_preds
+# str(data)
+# summary(data)
+str(c_data)
 # Shuffle dataset, append custom users
 set.seed(5)
 n <- nrow(data)
 data <- rbind(c_data,data[sample(n),])
+# str(data)
 ```
 Only select rows with predictable genders. Non-specified could also be considered if there were more samples, but at the time of writing this only **102** observations are present in the data set. In the original question set several questions were posed such that they measured the low-end of the trait rather than the high end. These values have been reversed.
 
@@ -59,17 +62,16 @@ data_qc <- data %>%
                           "N4", "A1", "A3", "A5", "A7", "C2", 
                           "C4", "C6", "C8", "O2", "O4", "O6"), funs(qCorrect)) %>%
               mutate(sex = ifelse(gender == 1, 0, 1)) 
-#str(data_qc)
 ```
 Calculate score based on 10 relevant questions to metric
 ```{r}
 data_rs <- data_qc %>% 
-            mutate(o_sum = rowSums(.[8:17]))  %>%
-            mutate(c_sum = rowSums(.[18:27])) %>% 
-            mutate(e_sum = rowSums(.[28:37])) %>% 
-            mutate(a_sum = rowSums(.[38:47])) %>%
-            mutate(n_sum = rowSums(.[48:57]))
-summary(data_rs[58:63])
+            mutate(o_sum = rowSums(.[48:57]))  %>%
+            mutate(c_sum = rowSums(.[38:47])) %>% 
+            mutate(e_sum = rowSums(.[8:17])) %>% 
+            mutate(a_sum = rowSums(.[28:37])) %>%
+            mutate(n_sum = rowSums(.[18:27]))
+str(data_rs[58:64])
 ```
 Calculate percentile scoring
 ```{r}
@@ -83,7 +85,7 @@ data_ps <- data_rs %>%
             mutate(n_ps = percent_rank(n_sum))
 
 # Select useful columns
-big5 <- data_ps[,c(59,65:69)] # percent scores and sex id
+big5 <- data_ps[,c(58,59,65:69)] # percent scores and sex id
 str(big5)
 ```
 
@@ -109,93 +111,87 @@ str(big5)
 
 train_indices <- (num_cust_data + 1):round(0.7*n) # ~70% of dataset
 test_indices <- c(1:num_cust_data,(round(0.7*n)+1):n) # ~30% of dataset
-train <- big5[train_indices,]
-test  <- big5[test_indices,]
-#str(cv_a)
+train <- big5[train_indices,2:7]
+test  <- big5[test_indices,2:7]
 str(train)
 str(test)
 ```
 
 Mixture Discriminant Analysis
-```{r, message=FALSE, warning=FALSE}
-mda_fit <- mda(sex~., data = train_a)
-summary(mda_fit)
-mda_predictions <-predict(mda_fit,test_a[,2:6])
-pred_table <-table(mda_predictions,test_a$sex)
-confusionMatrix(as.factor(mda_predictions),as.factor(test_a$sex))
-# 0.6642 accuracy
+```{r, warning=FALSE}
+mda_fit <- mda(sex~., data = train)
+mda_predictions <-predict(mda_fit,test[,2:6])
+pred_table <- table(mda_predictions,test$sex)
+confusionMatrix(as.factor(mda_predictions),as.factor(test$sex))
+cust_preds$mda <- mda_predictions[1:num_cust_data]
+# 0.6633 accuracy
 ```
 
 Quadratic Discriminant Analysis
-```{r, message=FALSE, warning=FALSE}
-qda_fit <- qda(sex~., data = train_a)
-summary(qda_fit)
-qda_predictions <-predict(qda_fit,test_a[,2:6])$class
-confusionMatrix(as.factor(qda_predictions),as.factor(test_a$sex))
+```{r, warning=FALSE}
+qda_fit <- qda(sex~., data = train)
+qda_predictions <-predict(qda_fit,test[,2:6])$class
+confusionMatrix(as.factor(qda_predictions),as.factor(test$sex))
+cust_preds$qda <- qda_predictions[1:num_cust_data]
 # 0.6675 accuracy
 ```
 
 Regularized Discriminant Analysis
-```{r, message=FALSE, warning=FALSE}
-rda_fit <- rda(sex~., data = train_a, gamma = 0.05, lambda = 0.01)
-summary(qda_fit)
-rda_predictions <-predict(rda_fit,test_a[,2:6])$class
-confusionMatrix(as.factor(rda_predictions),as.factor(test_a$sex))
+```{r, warning=FALSE}
+rda_fit <- rda(sex~., data = train, gamma = 0.05, lambda = 0.01)
+rda_predictions <-predict(rda_fit,test[,2:6])$class
+confusionMatrix(as.factor(rda_predictions),as.factor(test$sex))
+cust_preds$rda <- rda_predictions[1:num_cust_data]
 # 0.667 accuracy
 ```
 
 Neural Net
-```{r, message=FALSE, warning=FALSE}
-nnet_fit <- nnet(as.factor(sex)~., data=train_a, size=4, decay=0.0001, maxit=500)
-summary(nnet_fit)
-str(nnet_fit)
-
-nnet_predictions <-predict(nnet_fit,test_a[,2:6], type='class')
-confusionMatrix(as.factor(nnet_predictions),as.factor(test_a$sex))
+```{r, warning=FALSE}
+nnet_fit <- nnet(as.factor(sex)~., data=train, size=4, decay=0.0001, maxit=500)
+nnet_predictions <-predict(nnet_fit,test[,2:6], type='class')
+confusionMatrix(as.factor(nnet_predictions),as.factor(test$sex))
+cust_preds$nnet <- nnet_predictions[1:num_cust_data]
 # 0.6693 accuracy
 ```
 
 Flexible Discriminant Analysis
-```{r, message=FALSE, warning=FALSE}
-fda_fit <- fda(as.factor(sex)~., data=train_a)
-summary(fda_fit)
-str(fda_fit)
-
-fda_predictions <-predict(fda_fit,test_a[,2:6])
-confusionMatrix(as.factor(fda_predictions),as.factor(test_a$sex))
+```{r, warning=FALSE}
+fda_fit <- fda(as.factor(sex)~., data=train)
+fda_predictions <-predict(fda_fit,test[,2:6])
+confusionMatrix(as.factor(fda_predictions),as.factor(test$sex))
+cust_preds$fda <- fda_predictions[1:num_cust_data]
 # 0.666 accuracy
 ```
 
 Support Vector Machine
 ```{r, message=FALSE, warning=FALSE}
-svm_fit <- ksvm(as.factor(sex)~., data=train_a)
-svm_predictions <- predict(svm_fit, test_a[,2:6], type='response')
-table(svm_predictions, test_a$sex)
-confusionMatrix(as.factor(svm_predictions),as.factor(test_a$sex))
+svm_fit <- ksvm(as.factor(sex)~., data=train)
+svm_predictions <- predict(svm_fit, test[,2:6], type='response')
+confusionMatrix(as.factor(svm_predictions),as.factor(test$sex))
+cust_preds$svm <- svm_predictions[1:num_cust_data]
 # 0.6721 accuracy
 ```
 
 k-Nearest Neighbours
-```{r, message=FALSE, warning=FALSE}
-knn_fit <- knn3(as.factor(sex)~., data=train_a, k = 10)
-knn_predictions <- predict(knn_fit, test_a[,2:6], type='class')
-table(knn_predictions, test_a$sex)
-confusionMatrix(as.factor(knn_predictions),as.factor(test_a$sex))
+```{r, warning=FALSE}
+knn_fit <- knn3(as.factor(sex)~., data=train, k = 10)
+knn_predictions <- predict(knn_fit, test[,2:6], type='class')
+confusionMatrix(as.factor(knn_predictions),as.factor(test$sex))
+cust_preds$knn <- knn_predictions[1:num_cust_data]
 # 0.6295 accuracy
 ```
 
 Naive Bayes
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
-nb_fit <- naiveBayes(as.factor(sex)~., data=train_a)
-nb_predictions <- predict(nb_fit, test_a[,2:6], type='class')
-table(nb_predictions, test_a$sex)
-confusionMatrix(as.factor(nb_predictions),as.factor(test_a$sex))
+nb_fit <- naiveBayes(as.factor(sex)~., data=train)
+nb_predictions <- predict(nb_fit, test[,2:6], type='class')
+confusionMatrix(as.factor(nb_predictions),as.factor(test$sex))
+cust_preds$nb <- nb_predictions[1:num_cust_data]
 # 0.6675 accuracy
 ```
 
-
 Neural Network Model using 'keras' package
-```{r, message=FALSE, warning=FALSE}
+```{r, include=FALSE, message=FALSE, warning=FALSE}
 # Model initialization
 # epochs <- 15
 # batch_size <- 15
@@ -239,7 +235,7 @@ Neural Network Model using 'keras' package
 
 ```
 
-```{r}
+```{r, include=FALSE}
 # weightHistory <- R6::R6Class("weightHistory",
 #   inherit = KerasCallback,
 #   public = list(
@@ -252,11 +248,16 @@ Neural Network Model using 'keras' package
 # ))
 ```
 
-```{r}
+```{r, include=FALSE}
 # validation_model %>% evaluate(test_x, test_y, verbose = 0)
 # model %>% evaluate(test_x, test_y, verbose = 0)
 
 ```
+
+Custom User Predictions
+```{r}
+cust_preds
+ ```
 References:
 https://engineering.semantics3.com/debugging-neural-networks-a-checklist-ca52e11151ec  
 https://keras.rstudio.com/articles/functional_api.html#multi-input-and-multi-output-models  
