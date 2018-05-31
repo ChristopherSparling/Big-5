@@ -48,6 +48,29 @@ The questions related to each trait are summed and then a percentile calculated 
  - [Support Vector Machine](https://en.wikipedia.org/wiki/Support_vector_machine) : \[[_kernlab package_](https://en.wikipedia.org/wiki/Support_vector_machine)\]
  - [k-Nearest Neighbours](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm) : \[[_caret package_](https://cran.r-project.org/web/packages/caret/index.html)\]
  - [Naive Bayes](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) : \[[_e1071 package_](https://cran.r-project.org/web/packages/e1071/index.html)\]
- - Additionally, a custom multi-layer ANN was developed using the [_keras_](https://cran.r-project.org/web/packages/keras/index.html) package, though this is a more involved solution that the author is investigating
+ - Additionally, a custom multi-layer ANN was developed using the [_keras_](https://cran.r-project.org/web/packages/keras/index.html) package
  
-
+## Setup + Running
+First, download and install `R` 3.5.x from https://cran.rstudio.com/  
+  
+Next, download and run the `RStudio` installer for your platform from the organization's [download page](https://www.rstudio.com/products/rstudio/download/#download)  
+  
+Open `RStudio` and run through initial configuration steps such as selecting your CRAN mirror (see earlier link for more information on their place in the `R` ecosystem). 
+  
+With the IDE set up you can go ahead and fork/download the repository, ensuring the file structure is maintained. Once this is complete go ahead and open up `big-5-gender-predictor-notebook.Rmd`  
+  
+The final step is to copy the below codeblock into the console (don't worry, its only installing the necessary packages for the report to run):  
+````r
+install.packages('mda')
+install.packages('MASS')
+install.packages('klaR')
+install.packages('nnet')
+install.packages('kernlab')
+install.packages('caret')
+install.packages('e1071')
+install.packages("tidyverse")
+install.packages("keras")
+````  
+There will be some minor conflicts between the packages and required packages of the above, but these can be ignored.  
+  
+And you're done! Hit `Ctrl + Shift + Enter` to individually execute the code blocks denoted by the ` ```{r}  ``` ` wrapper or `Ctrl + Alt + P` to execute all code blocks above the cursor
