@@ -1,5 +1,5 @@
 ---
-title: "Big 5 Notebook"
+title: "Big 5 Gender Predictor"
 output:
   pdf_document: default
   html_notebook: default
@@ -16,13 +16,18 @@ library("tidyverse")
 library("keras")
 ```
 
-```{r}
+```{r, warning = FALSE}
 data <- read.csv("./data/data.csv") %>%
-  filter(gender %in% c(1,2))
-data_gu <- read.csv("./data/data.csv") %>% 
-  filter(gender %in% c(3))
+  filter(gender %in% c(1,2)) # General dataset
+c_data <- read.csv("./data/custom_data.csv") # Custom user dataset
+num_cust_data <- nrow(c_data) # Track number of custom user entries in the dataset
 str(data)
-#summary(data)
+summary(data)
+
+# Shuffle dataset, append custom users
+set.seed(5)
+n <- nrow(data)
+data <- rbind(c_data,data[sample(n),])
 ```
 Only select rows with predictable genders. Non-specified could also be considered if there were more samples, but at the time of writing this only **102** observations are present in the data set. In the original question set several questions were posed such that they measured the low-end of the trait rather than the high end. These values have been reversed.
 
@@ -45,7 +50,9 @@ qCorrect <- function(n){
 }
 qCorrect <- Vectorize(qCorrect) # Vectorize function to allow interoperation with dplyr::mutate
 ```
+
 ```{r}
+# Flip certain answer using qCorrect to align with traits as defined previously
 data_qc <- data %>%
               mutate_at(
                 .vars = c("E2", "E4", "E6", "E8", "E10", "N2", 
@@ -62,7 +69,7 @@ data_rs <- data_qc %>%
             mutate(e_sum = rowSums(.[28:37])) %>% 
             mutate(a_sum = rowSums(.[38:47])) %>%
             mutate(n_sum = rowSums(.[48:57]))
-#str(data_rs)
+summary(data_rs[58:63])
 ```
 Calculate percentile scoring
 ```{r}
@@ -75,53 +82,38 @@ data_ps <- data_rs %>%
             mutate(a_ps = percent_rank(a_sum)) %>%
             mutate(n_ps = percent_rank(n_sum))
 
-data_shaped <- data_ps[,c(58:68)] # sums, percent scores, and sex id
-big5 <- data_ps[,c(58,64:68)] # percent scores and sex id
-# str(data_shaped)
+# Select useful columns
+big5 <- data_ps[,c(59,65:69)] # percent scores and sex id
+str(big5)
 ```
 
-```{r}
-# Formulate proper data model
-set.seed(5)
-n <- nrow(big5)
-big5_a <- big5[sample(n),] # Shuffle dataset
-#big5_a <- big5 # Unshuffed dataset
-str(big5_a)
-big5 <- big5_a
-big5$x <- big5[,2:6] # Select only relevant columns
-big5$y <- big5$sex # Convert y to categorical
-```
+```{r, warning=FALSE}
+# train_indices <- (num_cust_data +1):round(0.7*n)
+# train_x <- scale(data.matrix(big5$x[train_indices,]))
+# train_y <- big5$y[train_indices]
+# str(train_x)
+# str(train_y)
 
-```{r, message=FALSE, warning=FALSE, include=FALSE}
+# test_indices <- c(1:num_cust_data,(round(0.7*n)+1):n)
+# test_x <- scale(data.matrix(big5$x[test_indices,]))
+# test_y <- big5$y[test_indices]
+# str(test_x)
+# str(test_y)
 
-train_indices <- 2:round(0.7*n)
-train_x <- scale(data.matrix(big5$x[train_indices,]))
-train_y <- big5$y[train_indices]
-str(train_x)
-str(train_y)
+# train_subset_indices <- 1:50
+# train_x_subset <- scale(data.matrix(big5$x[train_subset_indices,]))
+# train_y_subset <- big5$y[train_subset_indices]
+# str(train_x_subset)
+# str(train_y_subset) 
 
-test_indices <- c(1,(round(0.7*n)+1):n)
-test_x <- scale(data.matrix(big5$x[test_indices,]))
-test_y <- big5$y[test_indices]
-str(test_x)
-str(test_y)
 
-train_subset_indices <- 1:50
-train_x_subset <- scale(data.matrix(big5$x[train_subset_indices,]))
-train_y_subset <- big5$y[train_subset_indices]
-str(train_x_subset)
-str(train_y_subset)
-
-train_indices_a <- 2:round(0.65*n)
-cv_indices_a <- (round(0.65*n)+1):round(0.8*n)
-test_indices_a <- c(1,(round(0.8*n)+1):n)
-train_a <- big5_a[train_indices_a,]
-cv_a <- big5_a[cv_indices_a,]
-test_a <- big5_a[test_indices_a,]
-str(cv_a)
-str(train_a)
-str(test_a)
-
+train_indices <- (num_cust_data + 1):round(0.7*n) # ~70% of dataset
+test_indices <- c(1:num_cust_data,(round(0.7*n)+1):n) # ~30% of dataset
+train <- big5[train_indices,]
+test  <- big5[test_indices,]
+#str(cv_a)
+str(train)
+str(test)
 ```
 
 Mixture Discriminant Analysis
@@ -131,7 +123,6 @@ summary(mda_fit)
 mda_predictions <-predict(mda_fit,test_a[,2:6])
 pred_table <-table(mda_predictions,test_a$sex)
 confusionMatrix(as.factor(mda_predictions),as.factor(test_a$sex))
-mda_predictions
 # 0.6642 accuracy
 ```
 
@@ -141,7 +132,6 @@ qda_fit <- qda(sex~., data = train_a)
 summary(qda_fit)
 qda_predictions <-predict(qda_fit,test_a[,2:6])$class
 confusionMatrix(as.factor(qda_predictions),as.factor(test_a$sex))
-qda_predictions
 # 0.6675 accuracy
 ```
 
