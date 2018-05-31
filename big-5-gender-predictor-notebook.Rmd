@@ -1,6 +1,8 @@
 ---
 title: "Big 5 Notebook"
-output: html_notebook
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 ```{r}
 library('mda')
@@ -15,11 +17,11 @@ library("keras")
 ```
 
 ```{r}
-data <- read.csv("./BIG5/data.csv") %>% 
+data <- read.csv("./data/data.csv") %>%
   filter(gender %in% c(1,2))
-data_gu <- read.csv("./BIG5/data.csv") %>% 
+data_gu <- read.csv("./data/data.csv") %>% 
   filter(gender %in% c(3))
-#str(data)
+str(data)
 #summary(data)
 ```
 Only select rows with predictable genders. Non-specified could also be considered if there were more samples, but at the time of writing this only **102** observations are present in the data set. In the original question set several questions were posed such that they measured the low-end of the trait rather than the high end. These values have been reversed.
@@ -91,8 +93,7 @@ big5$y <- big5$sex # Convert y to categorical
 ```
 
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
-# Create training and testing sets
-  # No cross validation set in this deep-learning model, but could be implemented in the future
+
 train_indices <- 2:round(0.7*n)
 train_x <- scale(data.matrix(big5$x[train_indices,]))
 train_y <- big5$y[train_indices]
@@ -124,7 +125,7 @@ str(test_a)
 ```
 
 Mixture Discriminant Analysis
-```{r, message=FALSE, warning=FALSE, include=FALSE}
+```{r, message=FALSE, warning=FALSE}
 mda_fit <- mda(sex~., data = train_a)
 summary(mda_fit)
 mda_predictions <-predict(mda_fit,test_a[,2:6])
@@ -135,7 +136,7 @@ mda_predictions
 ```
 
 Quadratic Discriminant Analysis
-```{r, message=FALSE, warning=FALSE, include=FALSE}
+```{r, message=FALSE, warning=FALSE}
 qda_fit <- qda(sex~., data = train_a)
 summary(qda_fit)
 qda_predictions <-predict(qda_fit,test_a[,2:6])$class
@@ -145,7 +146,7 @@ qda_predictions
 ```
 
 Regularized Discriminant Analysis
-```{r, message=FALSE, warning=FALSE, include=FALSE}
+```{r, message=FALSE, warning=FALSE}
 rda_fit <- rda(sex~., data = train_a, gamma = 0.05, lambda = 0.01)
 summary(qda_fit)
 rda_predictions <-predict(rda_fit,test_a[,2:6])$class
@@ -154,7 +155,7 @@ confusionMatrix(as.factor(rda_predictions),as.factor(test_a$sex))
 ```
 
 Neural Net
-```{r, message=FALSE, warning=FALSE, include=FALSE}
+```{r, message=FALSE, warning=FALSE}
 nnet_fit <- nnet(as.factor(sex)~., data=train_a, size=4, decay=0.0001, maxit=500)
 summary(nnet_fit)
 str(nnet_fit)
@@ -165,7 +166,7 @@ confusionMatrix(as.factor(nnet_predictions),as.factor(test_a$sex))
 ```
 
 Flexible Discriminant Analysis
-```{r, message=FALSE, warning=FALSE, include=FALSE}
+```{r, message=FALSE, warning=FALSE}
 fda_fit <- fda(as.factor(sex)~., data=train_a)
 summary(fda_fit)
 str(fda_fit)
@@ -176,7 +177,7 @@ confusionMatrix(as.factor(fda_predictions),as.factor(test_a$sex))
 ```
 
 Support Vector Machine
-```{r, message=FALSE, warning=FALSE, include=FALSE}
+```{r, message=FALSE, warning=FALSE}
 svm_fit <- ksvm(as.factor(sex)~., data=train_a)
 svm_predictions <- predict(svm_fit, test_a[,2:6], type='response')
 table(svm_predictions, test_a$sex)
@@ -185,7 +186,7 @@ confusionMatrix(as.factor(svm_predictions),as.factor(test_a$sex))
 ```
 
 k-Nearest Neighbours
-```{r, message=FALSE, warning=FALSE, include=FALSE}
+```{r, message=FALSE, warning=FALSE}
 knn_fit <- knn3(as.factor(sex)~., data=train_a, k = 10)
 knn_predictions <- predict(knn_fit, test_a[,2:6], type='class')
 table(knn_predictions, test_a$sex)
@@ -202,71 +203,72 @@ confusionMatrix(as.factor(nb_predictions),as.factor(test_a$sex))
 # 0.6675 accuracy
 ```
 
+
 Neural Network Model using 'keras' package
-```{r, message=FALSE, warning=FALSE, include=FALSE}
+```{r, message=FALSE, warning=FALSE}
 # Model initialization
-epochs <- 15
-batch_size <- 15
-initializer_random_normal() # Initial weighting initialization
-
-model <- keras_model_sequential()
-model %>%
-  layer_dense(units = 5, 
-              input_shape = c(5), 
-              name = "Input_Layer") %>%
-  layer_activation(activation = 'sigmoid') %>%3
-  layer_dense(units = 7,
-              name = "Dense_2",
-              kernel_regularizer = ) %>%
-  layer_activation(activation = 'relu') %>%
-  layer_dense(units = 7) %>%
-  layer_activation(activation = 'sigmoid')
-
-model %>% compile(
-  loss = loss_binary_crossentropy,
-  optimizer = optimizer_rmsprop(lr = 0.01), # Modified learning rate, being checked in logarithmic steps
-  metrics = metric_binary_accuracy 
-)
-
-# validation_model <- model
-# validation_model %>% fit(
-#   x = train_x_subset, y = train_y_subset,
+# epochs <- 15
+# batch_size <- 15
+# initializer_random_normal() # Initial weighting initialization
+# 
+# model <- keras_model_sequential()
+# model %>%
+#   layer_dense(units = 5, 
+#               input_shape = c(5), 
+#               name = "Input_Layer") %>%
+#   layer_activation(activation = 'sigmoid') %>%3
+#   layer_dense(units = 7,
+#               name = "Dense_2",
+#               kernel_regularizer = ) %>%
+#   layer_activation(activation = 'relu') %>%
+#   layer_dense(units = 7) %>%
+#   layer_activation(activation = 'sigmoid')
+# 
+# model %>% compile(
+#   loss = loss_binary_crossentropy,
+#   optimizer = optimizer_rmsprop(lr = 0.01), # Modified learning rate, being checked in logarithmic steps
+#   metrics = metric_binary_accuracy 
+# )
+# 
+# # validation_model <- model
+# # validation_model %>% fit(
+# #   x = train_x_subset, y = train_y_subset,
+# #   epochs = epochs,
+# #   batch_size = batch_size,
+# #   verbose = 2
+# # )  
+# #summary(validation_model)
+# 
+# model %>% fit(
+#   x = train_x, y = train_y,
 #   epochs = epochs,
 #   batch_size = batch_size,
-#   verbose = 2
-# )  
-#summary(validation_model)
-
-model %>% fit(
-  x = train_x, y = train_y,
-  epochs = epochs,
-  batch_size = batch_size,
-  verbose = 2,
-  validation_split = 0.1
-)
+#   verbose = 2,
+#   validation_split = 0.1
+# )
 
 ```
 
 ```{r}
-weightHistory <- R6::R6Class("weightHistory",
-  inherit = KerasCallback,
-  public = list(
-    weights = NULL,
-    on_batch_end = function(batch, logs = list()) {
-      for(i in 1:3){
-        var(self$weights[[i]],1)
-      }
-    }
-))
+# weightHistory <- R6::R6Class("weightHistory",
+#   inherit = KerasCallback,
+#   public = list(
+#     weights = NULL,
+#     on_batch_end = function(batch, logs = list()) {
+#       for(i in 1:3){
+#         var(self$weights[[i]],1)
+#       }
+#     }
+# ))
 ```
 
 ```{r}
-validation_model %>% evaluate(test_x, test_y, verbose = 0)
-model %>% evaluate(test_x, test_y, verbose = 0)
+# validation_model %>% evaluate(test_x, test_y, verbose = 0)
+# model %>% evaluate(test_x, test_y, verbose = 0)
 
 ```
 References:
-https://engineering.semantics3.com/debugging-neural-networks-a-checklist-ca52e11151ec
-https://keras.rstudio.com/articles/functional_api.html#multi-input-and-multi-output-models
-https://towardsdatascience.com/l1-and-l2-regularization-methods-ce25e7fc831c
-https://machinelearningmastery.com/non-linear-classification-in-r/
+https://engineering.semantics3.com/debugging-neural-networks-a-checklist-ca52e11151ec  
+https://keras.rstudio.com/articles/functional_api.html#multi-input-and-multi-output-models  
+https://towardsdatascience.com/l1-and-l2-regularization-methods-ce25e7fc831c  
+https://machinelearningmastery.com/non-linear-classification-in-r
