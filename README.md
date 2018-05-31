@@ -32,5 +32,22 @@ data %>%
 ````
 The test responses are initially stored in a 57 column dataframe (author's responses shown below in list) with extraneous (though still interesting to explore) data regarding race, age, dominant hand, ISO country code, etc. The various levels and responses of these columns can be investigated furhter in _codebook.txt_.
 ````r
-author <- c(3,21,1,1,1,2,CAN,2,2,4,3,4,2,2,2,4,2,1,4,2,2,1,1,1,2,2,3,2,3,1,2,2,3,2,3,2,3,3,2,4,1,4,1,4,2,4,4,4,1,4,1,3,2,5,4,4,4)
+author <- c(3,21,1,1,1,2,CAN,
+            2,2,4,3,4,2,2,2,4,2, # openness
+            1,4,2,2,1,1,1,2,2,3, # concientiousness
+            2,3,1,2,2,3,2,3,2,3, # extraversion
+            3,2,4,1,4,1,4,2,4,4, # agreeableness
+            4,1,4,1,3,2,5,4,4,4) # neuroticism
 ````
+The questions related to each trait are summed and then a percentile calculated for each trait relative to the other responses. There is some unexciting data transformation and grouping into train and test sets, which are then fed to the following algorithms:
+ - [Mixture Discriminant Analysis](https://en.wikipedia.org/wiki/Linear_discriminant_analysis#Multiclass_LDA) : \[[_mda package_](https://cran.r-project.org/web/packages/mda/index.html)\]
+ - [Quadratic Discriminant Analysis](https://en.wikipedia.org/wiki/Quadratic_classifier#Quadratic_discriminant_analysis) : \[[_MASS package_](https://cran.r-project.org/web/packages/MASS/index.html)\]
+ - [Regularized Discriminant Analysis](https://en.wikipedia.org/wiki/Linear_discriminant_analysis) : \[[_klaR package_](https://cran.r-project.org/web/packages/klaR/index.html)\]
+ - [Neural Network](https://en.wikipedia.org/wiki/Artificial_neural_network) : \[[_nnet package_](https://en.wikipedia.org/wiki/Artificial_neural_network)\]
+ - [Flexible Discriminant Analysis](https://en.wikipedia.org/wiki/Linear_discriminant_analysis) : \[[_mda package_](https://cran.r-project.org/web/packages/mda/index.html)\]
+ - [Support Vector Machine](https://en.wikipedia.org/wiki/Support_vector_machine) : \[[_kernlab package_](https://en.wikipedia.org/wiki/Support_vector_machine)\]
+ - [k-Nearest Neighbours](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm) : \[[_caret package_](https://cran.r-project.org/web/packages/caret/index.html)\]
+ - [Naive Bayes](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) : \[[_e1071 package_](https://cran.r-project.org/web/packages/e1071/index.html)\]
+ - Additionally, a custom multi-layer ANN was developed using the [_keras_](https://cran.r-project.org/web/packages/keras/index.html) package, though this is a more involved solution that the author is investigating
+ 
+
