@@ -19,12 +19,16 @@ library("reshape2")
 ```{r read_data, warning = FALSE}
 set.seed(5)
 data <- read.csv("./data/data.csv") %>%
-  filter(gender %in% c(1,2)) # General dataset
+  filter(gender %in% c(1,2)) %>%
+  filter(age < 90) # General dataset
 c_data <- read.csv("./data/custom_data.csv") # Custom user dataset
 num_cust_data <- nrow(c_data) # Track number of custom user entries in the dataset
 cust_preds <- data.frame(name = c_data[1:num_cust_data,"name"]) # Placeholder dataframe for later-generated predictions
 n <-nrow(data)
 data <- rbind(c_data,data[sample(nrow(data)),]) # Shuffle dataset, prepend custom users
+data$race <- as.factor(data$race)
+levels(data$race) <- c("missed","Mixed Race", "Arctic (Siberian, Eskimo)", "Caucasian (European)", "Caucasian (Indian)", "Caucasian (Middle East)", "Caucasian (North African, Other)", "Indigenous Australian", "Native American", "North East Asian (Mongol, Tibetan, Korean Japanese, etc)", "Pacific (Polynesian, Micronesian, etc)", "South East Asian (Chinese, Thai, Malay, Filipino, etc)", "West African, Bushmen, Ethiopian", "Other")
+str(data)
 ```
 Only select rows with predictable genders. Non-specified could also be considered if there were more samples, but at the time of writing this only **102** observations are present in the data set. In the original question set several questions were posed such that they measured the low-end of the trait rather than the high end. These values have been reversed.
 
@@ -84,16 +88,31 @@ str(big5)
 
 Some basic data exploration
 ```{r data_exploration_basics, warning=FALSE}
-summary(data_ps)
-gender_breakdown <- data_ps[,2:7] %>% 
-  group_by(sex) %>%
-  summarise(avg_age = mean())
-gender_breakdown
-# or can be done simply with..
-table(big5[,2])
+location_age_breakdown <- data_ps %>%
+  filter(age < 120) %>% 
+  # remove invalid ages; could also implement this filter
+  # in main data, but appears to have no impact on model accuracy
+  group_by(sex,country) %>%
+  summarise(respondents = n(),
+            'age sd' = sd(age),
+            'age mean' = mean(age)) %>%
+filter(respondents > 300)
 
+race_age_breakdown <- data_ps %>%
+  filter(age < 120) %>% 
+  # remove invalid ages; could also implement this filter
+  # in main data, but appears to have no impact on model accuracy
+  group_by(sex,race) %>%
+  summarise(respondents = n(),
+            'age sd' = sd(age),
+            'age mean' = mean(age)) %>%
+  filter(respondents > 100)
+
+location_age_breakdown[order(location_age_breakdown$respondents, decreasing=TRUE),]
+race_age_breakdown[order(race_age_breakdown$respondents, decreasing=TRUE),]
 
 ```
+
 ```{r data_exploration_heatmap, warning=FALSE}
 # Correlation Heatmap
 corr_data <- big5[,3:7]
@@ -115,12 +134,11 @@ ggplot(data = melted_trait_cor, aes(`Trait B`, `Trait A`, fill = Value)) +
 ```
 
 ```{r data_exploration_gender_diff, warning=FALSE}
-
 # Personality Averages by Gender
 gender_mean <- big5[,2:7] %>% 
   group_by(sex) %>%
   summarise_all(funs(mean))
-
+gender_mean
 gender_diff <- (gender_mean[1,2:6] - gender_mean[2,2:6]) * 100 # difference between men and women
 gender_diff
 ```
