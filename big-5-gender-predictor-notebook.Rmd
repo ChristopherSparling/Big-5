@@ -83,6 +83,17 @@ str(big5)
 ```
 
 Some basic data exploration
+```{r data_exploration_basics, warning=FALSE}
+summary(data_ps)
+gender_breakdown <- data_ps[,2:7] %>% 
+  group_by(sex) %>%
+  summarise(avg_age = mean())
+gender_breakdown
+# or can be done simply with..
+table(big5[,2])
+
+
+```
 ```{r data_exploration_heatmap, warning=FALSE}
 # Correlation Heatmap
 corr_data <- big5[,3:7]
