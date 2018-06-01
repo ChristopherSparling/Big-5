@@ -49,7 +49,10 @@ The questions related to each trait are summed and then a percentile calculated 
  - [k-Nearest Neighbours](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm) : \[[_caret package_](https://cran.r-project.org/web/packages/caret/index.html)\]
  - [Naive Bayes](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) : \[[_e1071 package_](https://cran.r-project.org/web/packages/e1071/index.html)\]
  - Additionally, a custom multi-layer ANN was developed using the [_keras_](https://cran.r-project.org/web/packages/keras/index.html) package
- 
+
+## Some Data Exploration
+
+  
 ## Setup + Running
 First, download and install `R` 3.5.x from https://cran.rstudio.com/  
   
@@ -74,3 +77,12 @@ install.packages("keras")
 There will be some minor conflicts between the packages and required packages of the above, but these can be ignored.  
   
 And you're done! Hit `Ctrl + Shift + Enter` to individually execute the code blocks denoted by the ` ```{r}  ``` ` wrapper or `Ctrl + Alt + P` to execute all code blocks above the cursor
+
+## Adding Your Test Data
+Appending your personal data for the algorithms to predict on is quite simple:  
+1. Open your local copies of `./data/custom_data.csv` and `./notebook.txt`  
+  
+2. Observing the headers of the `.csv`, follow the commentary in the codebook and answer all personality and extraneous questions, seperating answers with a single comma. 
+> Note: It is important that all 58 columns be provided a value else errors will be thrown due to inconsistent row sizing. Obviously the only questions that require a valid answer are the 50 columns prefaced by an O, C, E, A, or N, and the gender column.  
+  
+3. Run the report as explained above in _Setup + Running_, your custom set of predictions will be available at the bottom of the report along with other custom users!
