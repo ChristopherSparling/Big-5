@@ -2,7 +2,6 @@
 title: "Big 5 Gender Predictor"
 output:
   pdf_document: default
-  html_notebook: default
 ---
 ```{r load_libraries, message=FALSE}
 library('mda')
@@ -14,6 +13,7 @@ library('caret')
 library('e1071')
 library("tidyverse")
 library("keras")
+library("reshape2")
 ```
 
 ```{r read_data, warning = FALSE}
@@ -82,6 +82,39 @@ big5 <- data_ps[,c(58,59,65:69)]
 str(big5)
 ```
 
+Some basic data exploration
+```{r data_exploration_heatmap, warning=FALSE}
+# Correlation Heatmap
+corr_data <- big5[,3:7]
+names(corr_data) <- c("Openness", "Concientiousness", "Extraversion", "Agreeableness", "Neuroticism")
+trait_cor <- round(cor(corr_data),2)
+trait_cor[lower.tri(trait_cor)] <- NA
+melted_trait_cor <- melt(trait_cor, na.rm = TRUE)
+names(melted_trait_cor) <- c("Trait A", "Trait B", "Value")
+
+ggplot(data = melted_trait_cor, aes(`Trait B`, `Trait A`, fill = Value)) +
+   geom_tile(color = "white") +
+   scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                        midpoint = 0, limit = c(-1,1), space = "Lab", 
+                        name="Pearson\nCorrelation") +
+   theme_minimal() + 
+   theme(axis.text.x = element_text(angle = 45, vjust = 1, size = 10, hjust = 1)) +
+   geom_text(aes(`Trait B`, `Trait A`, label = Value), color = "black", size = 4) +
+   coord_fixed()
+```
+
+```{r data_exploration_gender_diff, warning=FALSE}
+
+# Personality Averages by Gender
+gender_mean <- big5[,2:7] %>% 
+  group_by(sex) %>%
+  summarise_all(funs(mean))
+
+gender_diff <- (gender_mean[1,2:6] - gender_mean[2,2:6]) * 100 # difference between men and women
+gender_diff
+```
+
+Organize testing/training data
 ```{r test_train_data, warning=FALSE}
 train_indices <- (num_cust_data + 1):round(0.7*n) # ~70% of dataset
 test_indices <- c(1:num_cust_data,(round(0.7*n)+1):n) # ~30% of dataset
