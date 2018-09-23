@@ -30,7 +30,7 @@ data %>%
 3      2  11985 # female
 4      3    102 # other
 ````
-The test responses are initially stored in a 57 column dataframe (author's responses shown below in list) with extraneous (though still interesting to explore) data regarding race, age, dominant hand, ISO country code, etc. The various levels and responses of these columns can be investigated furhter in _codebook.txt_.
+The test responses are initially stored in a 57 column dataframe (author's responses shown below in list) with extraneous (though still interesting to explore) data regarding race, age, dominant hand, ISO country code, etc. The various levels and responses of these columns can be investigated further in _codebook.txt_.
 ````r
 author <- c(3,21,1,1,1,2,CAN,
             2,2,4,3,4,2,2,2,4,2, # openness
