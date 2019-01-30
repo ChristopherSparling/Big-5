@@ -50,9 +50,6 @@ The questions related to each trait are summed and then a percentile calculated 
  - [Naive Bayes](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) : \[[_e1071 package_](https://cran.r-project.org/web/packages/e1071/index.html)\]
  - Additionally, a custom multi-layer ANN was developed using the [_keras_](https://cran.r-project.org/web/packages/keras/index.html) package
 
-## Some Data Exploration
-
-  
 ## Setup + Running
 First, download and install `R` 3.5.x from https://cran.rstudio.com/  
   
